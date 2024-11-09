@@ -4,7 +4,9 @@ db.sqlite3
 .DS_Store
 venv
 my_env
+myenv
 venv_ubuntu
 .idea
 media
 config.ini
+node_modules
