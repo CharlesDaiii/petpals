@@ -1,0 +1,99 @@
+.login-page {
+  background-color: #ffddd2;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  flex-direction: row; /* 默认情况下为横向排列 */
+}
+
+.left-section,
+.right-section {
+  flex: 1;
+  max-width: 600px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.left-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-box {
+  background-color: #fff1ee;
+  border-radius: 20px;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 60px 40px; /* 增加顶部内边距，以容纳猫爪图标 */
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  background-image: url('../assets/overlay-background.svg');
+  background-repeat: no-repeat;
+  background-position: top center; /* 使猫爪图标位于顶部居中 */
+  background-size: 50px; /* 根据需要调整图标大小 */
+}
+
+
+.tagline {
+  font-family: "Open Sans", sans-serif;
+  font-size: 64px;
+  font-weight: 700;
+  color: #3d2828;
+  line-height: 1.2; 
+  margin-bottom: 40px;
+  text-align: left; 
+}
+
+.illustration-image {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  object-fit: cover;
+}
+
+.google-login-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border: 1px solid #70484880;
+  border-radius: 8px;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+}
+
+.google-login-button:hover {
+  background-color: #ffe5e5;
+}
+
+.google-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+}
+
+.sign-up-text {
+  font-family: "Karla", sans-serif;
+  font-size: 16px;
+  color: #000000;
+  margin-top: 20px;
+}
+
+.sign-up-link {
+  color: #ff7578;
+  cursor: pointer;
+}
