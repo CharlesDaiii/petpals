@@ -13,13 +13,16 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from django.views import View
 from .forms import RegisterForm
-from rest_framework.generics import CreateAPIView
 from .models import Pet
 from .serializers import PetSerializer
 from django.utils.decorators import method_decorator
 
-
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
+from django.contrib.auth import login
+from django.http import JsonResponse, HttpResponseRedirect
 
 def home(request):
     return render(request, 'api/home.html')
@@ -69,3 +72,29 @@ class PetFormView(View):
             form.save()  
             return redirect('pet-success')  
         return render(request, 'api/pet_form.html', {'form': form})
+    
+
+@login_required
+def oauth_success(request):
+    return JsonResponse({'status': 'success', 'redirect_url': '/'})
+
+def oauth_complete(request):
+    token = request.GET.get('token')
+    next_url = request.GET.get('next', '')
+
+    if not token:
+        return JsonResponse({"error": "Token is missing"}, status=400)
+
+    try:
+        print(f"User logged in successfully")
+
+        front_end_url = f"http://localhost:3000/{next_url}"
+        response = HttpResponseRedirect(front_end_url)
+        response.set_cookie('session_token', 'your_session_token', httponly=True, secure=False, samesite='None')
+        return response
+
+    except Exception as e:
+        error_message = f"Unexpected error: {str(e)}"
+        print(error_message)
+        return JsonResponse({"error": error_message}, status=500)
+    
