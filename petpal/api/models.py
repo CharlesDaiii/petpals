@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 
 class Pet(models.Model):
     name = models.CharField(max_length=100)
+
     sex = models.CharField(max_length=10, choices=[
         ('Male', 'Male'),
         ('Female', 'Female'),
@@ -33,3 +34,7 @@ class Pet(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    pet = models.OneToOneField(Pet, on_delete=models.CASCADE, blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username

@@ -1,14 +1,49 @@
 // src/components/HomePage.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/HomePage.css';
+import protectRedirect from './protectRedirect';
 
 function HomePage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleGetStarted = () => {
+    protectRedirect("", "ProfileSignUp");
+  }
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const response = await protectRedirect("", "", {}, false);
+        console.log("Response:", response);
+
+        if (response && response.isAuthenticated) {
+            setIsLoggedIn(true);
+        }
+    } catch (error) {
+        console.error("Error in checkAuthStatus:", error);
+    }
+    };
+
+    checkAuthStatus();
+  }, []);
+
+  const handleLogin = () => {
+    if (isLoggedIn) {
+      document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      setIsLoggedIn(false);
+      alert("Logged out successfully");
+    } else {
+        window.location.href = "/Register";
+    }
+  }
+
   return (
     <div className="HomePage">
       <header className="AppHeader">
         <button className="header-button">Home</button>
-        <button className="header-button">Login</button>
-        <button className="header-button">Register</button>
+        <button className="header-button" onClick={handleLogin}>
+          {isLoggedIn ? "Logout" : "Login"}
+        </button>
       </header>
 
       <div className="Frame2">
@@ -19,7 +54,7 @@ function HomePage() {
             <span className="highlighted-text">Match</span>
             <span className="black-text">.Wag!</span>
           </div>
-          <button className="GetStartedButton">Get Started</button>
+          <button className="GetStartedButton" onClick={handleGetStarted}>Get Started</button>
         </div>
       </div>
 
