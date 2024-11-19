@@ -1,49 +1,69 @@
 // src/components/HomePage.js
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import '../styles/HomePage.css';
 import protectRedirect from './protectRedirect';
+import { useState, useEffect } from 'react';
+import getCSRFToken from './getCSRFToken';
 
 function HomePage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const handleGetStarted = () => {
-    protectRedirect("", "ProfileSignUp");
-  }
-
+  const [isLogin, setIsLogin] = useState(false);
+  const [username, setUsername] = useState("");
   useEffect(() => {
-    const checkAuthStatus = async () => {
-      try {
-        const response = await protectRedirect("", "", {}, false);
-        console.log("Response:", response);
+    const fetchData = async () => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND}/auth/redirect/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
 
-        if (response && response.isAuthenticated) {
-            setIsLoggedIn(true);
+            if (response.ok) {
+                const data = await response.json(); // Parse the JSON response
+                console.log("Fetched data:", data);
+                if (data && data.is_authenticated) {
+                    setIsLogin(true);
+                    setUsername(data.username);
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
         }
-    } catch (error) {
-        console.error("Error in checkAuthStatus:", error);
-    }
     };
-
-    checkAuthStatus();
+    fetchData();  
   }, []);
 
+  const handleGetStarted = () => {
+    protectRedirect("", "/ProfileSignUp");
+  }
+
   const handleLogin = () => {
-    if (isLoggedIn) {
-      document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      setIsLoggedIn(false);
-      alert("Logged out successfully");
+    if (!isLogin) {
+      window.location.href = "/Register";
     } else {
-        window.location.href = "/Register";
+      fetch(`${process.env.REACT_APP_BACKEND}/api/logout/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken(),
+        },
+        credentials: 'include',
+      })
+      .then(response => {
+        if (response.ok) {
+          setIsLogin(false);
+          setUsername("");
+        }
+      })
     }
   }
 
   return (
     <div className="HomePage">
       <header className="AppHeader">
-        <button className="header-button">Home</button>
-        <button className="header-button" onClick={handleLogin}>
-          {isLoggedIn ? "Logout" : "Login"}
-        </button>
+        <button className="header-button">{username}</button>
+        <button className="header-button" onClick= {handleLogin}>{isLogin ? "Logout" : "Login"}</button>
       </header>
 
       <div className="Frame2">
