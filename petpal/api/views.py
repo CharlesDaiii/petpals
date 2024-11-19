@@ -34,6 +34,8 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.contrib.auth import logout
 
+import googlemaps
+
 # --- authentication methods ---
 
 # # get oauth redirect link
@@ -78,8 +80,6 @@ def api_logout(request):
         logout(request)
         return JsonResponse({"message": "Successfully logged out"}, status=200)
     return JsonResponse({"error": "Invalid request method"}, status=400)
-
-import googlemaps
 
 def home(request):
     return render(request, 'api/home.html')
