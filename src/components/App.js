@@ -6,13 +6,11 @@ import SignupPage from './SignupPage';
 import Register from './Register';
 import Transition from './Transition';
 import Matching from './Matching';
-<<<<<<< HEAD
-=======
 import ProfileSignUp from './ProfileSignUp';
 import AddPhoto from './AddPhoto';
 import MyProfile from './MyProfile';
 import OtherProfile from './OtherProfile';
->>>>>>> 946c759 (putting 4 pages(profilesignup, photos, characters, redflag) in one url)
+import Friends from './Friends';
 
 function App() {
     const [petName, setPetName] = useState("");
@@ -34,11 +32,9 @@ function App() {
                     <Route path="/SignupPage" element={<SignupPage />} />
                     <Route path="/Transition" element={<Transition />} />
                     <Route path="/Matching" element={<Matching />} />
-<<<<<<< HEAD
-=======
                     <Route path="/MyProfile" element={<MyProfile />} />
                     <Route path="/OtherProfile" element={<OtherProfile />} />
->>>>>>> 946c759 (putting 4 pages(profilesignup, photos, characters, redflag) in one url)
+                    <Route path="/Friends" element={<Friends />} />
                 </Routes>
             </div>
         </Router>

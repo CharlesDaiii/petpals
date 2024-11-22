@@ -6,7 +6,9 @@
     height: 100vh;
     width: 100%;
     position: relative;
-    padding: 20px;
+    padding: 40px;
+    overflow: hidden;
+    perspective: 1000px;
 }
 
 .controls {
@@ -27,12 +29,13 @@
 }
 
 .profile-card {
-    background-color: #ffffff;
-    border-radius: 30px;
-    box-shadow: 0px 7px 30px rgba(0, 0, 0, 0.1);
-    margin: 0 15px;
-    padding: 25px;
-    text-align: center;
+    width: 280px;
+    height: 400px;
+    position: absolute;
+    transition: all 0.5s ease;
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -49,11 +52,12 @@
 }
 
 .profile-image {
-    background-color: #ccc;
     width: 100%;
-    height: 60%;
+    height: 200px;
     border-radius: 15px;
-    margin-bottom: 10px;
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 15px;
 }
 
 .profile-name {
@@ -81,7 +85,8 @@
     cursor: pointer;
     font-size: 1.1rem;
     width: 80%;
-    margin: 10px auto 0;
+    margin: 10px auto 20px;
+    align-self: center;
 }
 
 .arrow {
@@ -123,6 +128,23 @@
     .profile-details {
         font-size: 1rem;
     }
+
+    .cards-container {
+        width: 700px;
+    }
+    
+    .profile-card {
+        width: 240px;
+        height: 360px;
+    }
+    
+    .profile-card.left {
+        transform: translateX(-250px) scale(0.9);
+    }
+    
+    .profile-card.right {
+        transform: translateX(250px) scale(0.9);
+    }
 }
 
 @media (max-width: 768px) {
@@ -143,4 +165,55 @@
     .profile-details {
         font-size: 0.9rem;
     }
+
+    .cards-container {
+        width: 500px;
+    }
+    
+    .profile-card {
+        width: 220px;
+        height: 340px;
+    }
+    
+    .profile-card.left {
+        transform: translateX(-230px) scale(0.9);
+    }
+    
+    .profile-card.right {
+        transform: translateX(230px) scale(0.9);
+    }
+}
+
+.cards-container {
+    position: relative;
+    width: 900px;
+    height: 500px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-card.left {
+    transform: translateX(-290px) scale(0.8);
+    opacity: 0.8;
+    z-index: 1;
+}
+
+.profile-card.center {
+    transform: translateX(0) scale(1);
+    z-index: 2;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.profile-card.right {
+    transform: translateX(290px) scale(0.8);
+    opacity: 0.8;
+    z-index: 1;
+}
+
+.profile-card.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(0) scale(0.8);
 }
