@@ -1,40 +1,35 @@
-from django.conf import settings
-from django.shortcuts import render
-
-# Create your views here.
-from rest_framework import viewsets
-from .models import Pet
-from .forms import PetForm
-from .serializers import PetSerializer
-from django.http import HttpResponse
-
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import AuthenticationForm
-from django.shortcuts import render, redirect
-from django.views import View
-from .forms import RegisterForm
-from .models import Pet
-from .serializers import PetSerializer
-from django.utils.decorators import method_decorator
-
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-
-from django.contrib.auth import login
-from django.http import JsonResponse, HttpResponseRedirect
-
-from django.contrib.auth.models import User
-from .models import UserProfile
-
-from django.views.decorators.http import require_GET
+from datetime import datetime
 from urllib.parse import urlencode
+import json
 
+from django.conf import settings
+from django.core.files.storage import default_storage
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.http import JsonResponse
-from django.contrib.auth import logout
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET
 
+from rest_framework import viewsets, status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .models import Pet, UserProfile
+from .forms import PetForm, RegisterForm
+from .serializers import PetSerializer
+from .filters import process_target_pet
 import googlemaps
+from rest_framework.viewsets import ModelViewSet
+
+
 
 # --- authentication methods ---
 
@@ -90,9 +85,14 @@ def login(request):
 def home(request):
     return render(request, 'api/home.html')
 
-class PetViewSet(viewsets.ModelViewSet):
+class PetViewSet(ModelViewSet):
     queryset = Pet.objects.all()
     serializer_class = PetSerializer
+    permission_classes = [IsAuthenticated]  
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)  
+
 
 class RegisterView(View):
     def get(self, request):
@@ -132,10 +132,37 @@ class PetFormView(View):
             form.save()  
             return redirect('pet-success')  
         return render(request, 'api/pet_form.html', {'form': form})
-    
-@custom_login_required
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@login_required
 def profile_setup(request):
-    return JsonResponse({"message": "User is authenticated"}, status=200)
+    try:
+        user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+        
+        pet_data = request.data
+        pet = Pet.objects.create(
+            owner=request.user,
+            name=pet_data['name'],
+            sex=pet_data['sex'],
+            preferred_time=pet_data['preferred_time'],
+            breed=pet_data['breed'],
+            birth_date=pet_data['birth_date'],
+            location=pet_data['location'],
+            weight=float(pet_data['weight']),
+            health_states=pet_data.get('health_states', ''),
+            characters=pet_data.get('characters', ''),
+            red_flags=pet_data.get('red_flags', ''),
+            photos=pet_data.get('photos', [])
+        )
+        
+        user_profile.pet = pet
+        user_profile.save()
+        
+        return Response({'message': 'Profile created successfully'}, status=201)
+    except Exception as e:
+        return Response({'error': str(e)}, status=400)
+
 
 # helper function to check path suffix:
 def validate_url(next_url):
@@ -147,3 +174,30 @@ def calculate_distance(start, end):
     gmaps = googlemaps.Client(key=settings.GOOGLE_MAPS_API_KEY)
     distance = gmaps.distance_matrix(start, end)
     return distance['rows'][0]['elements'][0]['distance']['value'] / 1609.34 # convert to miles
+
+@login_required
+def matching_redirect(request):
+    return redirect('http://localhost:3000/Matching')
+
+def matching(request):
+    if request.method == 'POST':
+        try:
+            target_pet = json.loads(request.body)
+            result = process_target_pet(target_pet)
+            return JsonResponse({'results': result}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+class MatchingAPIView(APIView):
+    def post(self, request):
+        try:
+            target_pet = request.data
+            result = process_target_pet(target_pet)
+            return Response({'results': result}, status=200)
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
+    
+    def get(self, request):
+        return Response({'error': 'Invalid request method'}, status=405)
