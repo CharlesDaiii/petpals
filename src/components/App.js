@@ -2,13 +2,17 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './HomePage';
-import ProfileSignUp from './ProfileSignUp';
+import SignupPage from './SignupPage';
 import Register from './Register';
-import AddPhoto from './AddPhoto';
-import Characters from './Characters';
-import RedFlags from './RedFlags';
 import Transition from './Transition';
 import Matching from './Matching';
+<<<<<<< HEAD
+=======
+import ProfileSignUp from './ProfileSignUp';
+import AddPhoto from './AddPhoto';
+import MyProfile from './MyProfile';
+import OtherProfile from './OtherProfile';
+>>>>>>> 946c759 (putting 4 pages(profilesignup, photos, characters, redflag) in one url)
 
 function App() {
     const [petName, setPetName] = useState("");
@@ -27,10 +31,14 @@ function App() {
                         path="/AddPhoto" 
                         element={<AddPhoto petName={petName} />} 
                     />
-                    <Route path="/Characters" element={<Characters />} />
-                    <Route path="/RedFlags" element={<RedFlags />} />
+                    <Route path="/SignupPage" element={<SignupPage />} />
                     <Route path="/Transition" element={<Transition />} />
                     <Route path="/Matching" element={<Matching />} />
+<<<<<<< HEAD
+=======
+                    <Route path="/MyProfile" element={<MyProfile />} />
+                    <Route path="/OtherProfile" element={<OtherProfile />} />
+>>>>>>> 946c759 (putting 4 pages(profilesignup, photos, characters, redflag) in one url)
                 </Routes>
             </div>
         </Router>
