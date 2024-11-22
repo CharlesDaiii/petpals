@@ -4,22 +4,6 @@ import "../styles/ProfileSignUp.css";
 import "../styles/AddPhoto.css";
 import protectRedirect from "./protectRedirect";
 import getCSRFToken from "./getCSRFToken";
-<<<<<<< HEAD
-
-const ProfileSignUp = () => {
-    const [shouldRender, setShouldRender] = useState(false);
-    const handleHome = () => {
-        window.location.href = "/";
-    }
-    useEffect(() => {
-        const path = "/ProfileSignUp";
-        const isRedirectNeeded = protectRedirect(path, path);
-        if (!isRedirectNeeded) {
-            setShouldRender(true);
-        }
-    }, []);
-
-=======
 import "../styles/RedFlags.css"; 
 
 
@@ -56,7 +40,6 @@ const redFlagsList = [
 const ProfileSignUp = () => {
     const [shouldRender, setShouldRender] = useState(false);
     const [currentPage, setCurrentPage] = useState(1); 
->>>>>>> 946c759 (putting 4 pages(profilesignup, photos, characters, redflag) in one url)
     const [formData, setFormData] = useState({
         name: "",
         sex: "",
@@ -120,19 +103,37 @@ const ProfileSignUp = () => {
     };
 
     // 上传照片事件处理函数
-    const handlePhotoUpload = (event) => {
-        const files = Array.from(event.target.files);
-        const updatedPhotos = [...photos];
-
-        files.forEach((file) => {
-            const firstEmptyIndex = updatedPhotos.indexOf(null);
-            if (firstEmptyIndex !== -1) {
-                updatedPhotos[firstEmptyIndex] = URL.createObjectURL(file);
-            }
+    const handlePhotoUpload = async (event) => {
+        const files = event.target.files;
+        const formData = new FormData();
+    
+        Array.from(files).forEach((file) => {
+            formData.append("photos", file);
         });
-
-        setPhotos(updatedPhotos);
+    
+        try {
+            const csrfToken = getCSRFToken();
+            const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/upload-photos/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken,
+                },
+                credentials: 'include',
+                body: formData, // 上传文件
+            });
+    
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Uploaded photo URLs:", data.photos);
+                setPhotos(data.photos); // 更新照片 URL
+            } else {
+                console.error("Failed to upload photos.");
+            }
+        } catch (error) {
+            console.error("Photo upload error:", error);
+        }
     };
+    
 
     const triggerFileInput = () => {
         fileInputRef.current.click();
@@ -166,23 +167,14 @@ const ProfileSignUp = () => {
         console.log("CSRF Token:", getCSRFToken());
 
         try {
-<<<<<<< HEAD
-            const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/ProfileSignUp`, {
-=======
             const csrfToken = getCSRFToken();
             console.log("Making fetch request to:", `${process.env.REACT_APP_BACKEND}/api/ProfileSignUp/`);
             
             const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/ProfileSignUp/`, {
->>>>>>> 946c759 (putting 4 pages(profilesignup, photos, characters, redflag) in one url)
                 method: "POST",
-                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
-<<<<<<< HEAD
-                    "X-CSRFToken": getCSRFToken()
-=======
                     "X-CSRFToken": csrfToken,
->>>>>>> 946c759 (putting 4 pages(profilesignup, photos, characters, redflag) in one url)
                 },
                 credentials: 'include',
                 body: JSON.stringify(payload)
@@ -193,22 +185,7 @@ const ProfileSignUp = () => {
 
             if (response.ok) {
                 alert("Pet profile created successfully!");
-<<<<<<< HEAD
-                setFormData({
-                    name: "",
-                    sex: "",
-                    preferred_time: "",
-                    breed: "",
-                    birth_date: "",
-                    location: "",
-                    weight: "",
-                    health_states: []
-                });
-            } else if (response.status === 401) {
-                window.location.href = `/Register?next=${window.location.pathname}`
-=======
                 window.location.href = '/Matching';
->>>>>>> 946c759 (putting 4 pages(profilesignup, photos, characters, redflag) in one url)
             } else {
                 const data = await response.json();
                 console.error("Server error response:", data);
@@ -229,113 +206,6 @@ const ProfileSignUp = () => {
 
     return (
         <div className="profile-signup">
-<<<<<<< HEAD
-            <header className="AppHeader">
-                <button className="header-button" onClick={handleHome}>Home</button>
-            </header>
-
-            <div className="form-container">
-                <h2 className="profile-title">Profile Sign Up</h2>
-                <form onSubmit={handleSubmit} className="form-grid">
-                    <label>
-                        Pet Name:
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleInputChange}
-                            className="input-field"
-                            placeholder="Enter pet's name"
-                        />
-                    </label>
-                    <label>
-                        Birth Date:
-                        <input
-                            type="date"
-                            name="birth_date"
-                            value={formData.birth_date}
-                            onChange={handleInputChange}
-                            className="input-field"
-                        />
-                    </label>
-                    <label>
-                        Breed:
-                        <input
-                            type="text"
-                            name="breed"
-                            value={formData.breed}
-                            onChange={handleInputChange}
-                            className="input-field"
-                            placeholder="Enter breed"
-                        />
-                    </label>
-                    <label>
-                        Location:
-                        <input
-                            type="text"
-                            name="location"
-                            value={formData.location}
-                            onChange={handleInputChange}
-                            className="input-field"
-                            placeholder="Enter location"
-                        />
-                    </label>
-                    <label>
-                        Sex:
-                        <select
-                            name="sex"
-                            value={formData.sex}
-                            onChange={handleInputChange}
-                            className="input-field"
-                        >
-                            <option value="">Select</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Neutered">Neutered</option>
-                        </select>
-                    </label>
-                    <label>
-                        Preferred Time:
-                        <select
-                            name="preferred_time"
-                            value={formData.preferred_time}
-                            onChange={handleInputChange}
-                            className="input-field"
-                        >
-                            <option value="">Select</option>
-                            <option value="Morning">Morning</option>
-                            <option value="Midday">Midday</option>
-                            <option value="Afternoon">Afternoon</option>
-                            <option value="Evening">Evening</option>
-                        </select>
-                    </label>
-                    <label>
-                        Weight (LBS):
-                        <input
-                            type="number"
-                            name="weight"
-                            value={formData.weight}
-                            onChange={handleInputChange}
-                            className="input-field"
-                            placeholder="Enter weight"
-                        />
-                    </label>
-                    <label>
-                        Health State:
-                        <Select
-                            isMulti
-                            options={healthOptions}
-                            onChange={handleSelectChange}
-                            classNamePrefix="select"
-                            placeholder="Select health state"
-                        />
-                    </label>
-                    <button type="submit" className="next-button">
-                        Submit
-                    </button>
-                </form>
-            </div>
-=======
             {currentPage === 1 && (
                 <div className="form-container">
                     <h2 className="profile-title">Profile Sign Up</h2>
@@ -555,7 +425,6 @@ const ProfileSignUp = () => {
                     </div>
                 </div>
             )}
->>>>>>> 946c759 (putting 4 pages(profilesignup, photos, characters, redflag) in one url)
         </div>
     );
 };
