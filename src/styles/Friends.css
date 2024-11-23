@@ -109,6 +109,15 @@
     transform: translateY(0);
 }
 
+.wag-back-button.wagging {
+    background-color: #f0b5b0;
+    cursor: pointer;
+}
+
+.wag-back-button.wagging:hover {
+    background-color: #e67067;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
     .friends-content {
@@ -172,5 +181,17 @@
     color: #ec847c;
     text-align: center;
     padding: 1rem;
+}
+
+.friend-name {
+    color: #ec847c;
+    cursor: pointer;
+    font-weight: 600;
+    display: inline;
+}
+
+.friend-name:hover {
+    color: #e67067;
+    text-decoration: underline;
 }
   
