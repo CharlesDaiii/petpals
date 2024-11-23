@@ -21,6 +21,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_PHOTO_URL = 'https://my-bucket.s3.amazonaws.com/default.jpg'
 
+# switch to 'http://localhost:3000' for development
+FRONTEND_URL = "http://team20.cmu-webapps.com"
+BACKEND_URL = "localhost:8000"
 
 # ========== Configuration ========== #
 CONFIG = ConfigParser()
@@ -29,7 +32,7 @@ CONFIG.read(BASE_DIR / "config.ini")
 # ========== Security ========== #
 SECRET_KEY = CONFIG.get("Django", "Secret")
 DEBUG = True
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'team20.cmu-webapps.com','3.15.252.217']
 
 # ========== Applications ========== #
 INSTALLED_APPS = [
@@ -59,8 +62,8 @@ MIDDLEWARE = [
 
 # ========== CORS Configuration ========== #
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
+CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
+CSRF_TRUSTED_ORIGINS = [FRONTEND_URL]
 
 # ========== URL Configuration ========== #
 ROOT_URLCONF = "petpal.urls"
@@ -134,9 +137,9 @@ except:
     GOOGLE_MAPS_API_KEY = ""
 
 # ========== Login/Redirect Configuration ========== #
-LOGIN_URL = f"{CORS_ALLOWED_ORIGINS[0]}/Register"
-SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = "http://localhost:8000/auth/complete/google-oauth2/"
-LOGIN_REDIRECT_URL = "http://localhost:3000/"
+LOGIN_URL = f"{FRONTEND_URL}/Register"
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = F"{BACKEND_URL}/auth/complete/google-oauth2/"
+LOGIN_REDIRECT_URL = FRONTEND_URL
 
 # ========== Allowed Path Suffixes ========== #
 ALLOWED_PATH_SUFFIXES = [
@@ -154,7 +157,7 @@ try:
         f.write(f"REACT_APP_GOOGLE_CLIENT_ID={SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}\n")
         if GOOGLE_MAPS_API_KEY:
             f.write(f"REACT_APP_GOOGLE_MAPS_API_KEY={GOOGLE_MAPS_API_KEY}\n")
-        f.write(f"REACT_APP_BACKEND=http://localhost:8000\n")
+        f.write(f"REACT_APP_BACKEND={BACKEND_URL}\n")
     print(f".env file generated successfully at {env_path} with client_id.")
 except KeyError:
     print("Error: 'client_id' not found in config.ini under [GoogleOAuth2] section.")
