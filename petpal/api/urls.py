@@ -9,6 +9,7 @@ from . import views
 router = DefaultRouter()
 router.register(r'pets', views.PetViewSet)
 
+
 urlpatterns = [
     path('', views.home, name='home'),
     path('api/', include(router.urls)),
@@ -20,7 +21,21 @@ urlpatterns = [
     path('auth/redirect/', views.oauth_redirect, name='oauth_redirect'),
     path('ProfileSignUp/', views.profileSignUp, name='profileSignUp'),
     path('api/ProfileSignUp/', views.profile_setup, name='profile_setup'),
-    path('Matching/', views.matching_redirect, name='matching_redirect'),
     # path('api/matching/', views.MatchingAPIView.as_view(), name='matching'),
+    path('Matching/', views.matching_redirect, name='matching_redirect'),
     path('api/matching/', views.matching, name='matching'),
+    path('api/user-pet/', views.get_user_pet, name='user-pet'),
+    path('api/match-pet/', views.match_pet, name='match_pet'),
+    path('api/upload-photos/', views.upload_photos, name='upload-photos'),  
+    path('api/user-pet/', views.get_user_pet, name='get_user_pet'),
+    path('api/check-pet-exists/', views.check_pet_exists, name='check-pet-exists'),
+    path('api/follow-pet/<int:pet_id>/', views.follow_pet, name='follow-pet'),
+    path('api/following/', views.get_following, name='get-following'),
+    path('api/followers/', views.get_followers, name='get-followers'),
+    path('api/unfollow-pet/<int:pet_id>/', views.unfollow_pet, name='unfollow-pet'),
+    path('api/wag-back/<int:follower_id>/', views.wag_back, name='wag-back'),
+    path('api/update-pet/', views.update_pet, name='update-pet'),
 ]
+
+if settings.DEBUG:  
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
