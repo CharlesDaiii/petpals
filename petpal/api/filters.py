@@ -8,9 +8,6 @@ from django.conf import settings
 from pathlib import Path
 from django.core.serializers import serialize
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-file_path = BASE_DIR / "data" / "pets_data.json"
-
 # --- tools methods ---
 def calculate_distance(start, end):
     gmaps = googlemaps.Client(key=settings.GOOGLE_MAPS_API_KEY)
@@ -252,10 +249,6 @@ def id_to_display(matching_pets, target_pet, user_id):
 # --- main method ---
 def process_target_pet(target_pet_id, user_id):
     try:
-        # with open(file_path, 'r') as f:
-        #     pets_data = json.load(f)
-        # combile database
-        # pets_data = pets_data + list(Pet.objects.all().values())
         target_pet = serialize('json', Pet.objects.filter(id=target_pet_id))
         target_pet = json.loads(target_pet)
         pet = target_pet[0]
