@@ -29,24 +29,6 @@ from .filters import process_target_pet
 import googlemaps
 from rest_framework.viewsets import ModelViewSet
 
-
-
-# --- authentication methods ---
-
-# # get oauth redirect link
-# def google_login_link(request):
-#     google_login_url = reverse('social:begin', args=['google-oauth2'])
-#     return JsonResponse({'google_login_url': google_login_url})
-
-# # custom oauth complete
-# def oauth_complete(request):
-#     print("oauth_complete")
-#     # add additional user data
-#     if request.user.is_authenticated:
-#         return JsonResponse({"message": "User is authenticated",
-#                              "user": request.user}, status=200)
-#     return JsonResponse({"message": "User is not authenticated"}, status=401)
-    
 # Custom login required decorator, return json response
 def custom_login_required(view_func):
     def wrapper(request, *args, **kwargs):
@@ -179,22 +161,32 @@ def calculate_distance(start, end):
 def matching_redirect(request):
     return redirect('http://localhost:3000/Matching')
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def matching(request):
-    if request.method == 'POST':
-        try:
-            target_pet = json.loads(request.body)
-            result = process_target_pet(target_pet)
-            return JsonResponse({'results': result}, status=200)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
-    
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+        print(f"Found user profile for: {request.user.username}")
+        
+        if not user_profile.pet or not user_profile.pet.location:
+            print("No pet or location found for user")
+            return Response({'error': 'User pet location not found'}, status=400)
+
+        result = process_target_pet(user_profile.pet.id, request.user.id)
+        print(f"Matching result: {result}")
+        return JsonResponse({'results': result}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+@permission_classes([IsAuthenticated])
 class MatchingAPIView(APIView):
     def post(self, request):
         try:
-            target_pet = request.data
-            result = process_target_pet(target_pet)
+            pet_id = request.data
+            print(f"Processing target pet: {pet_id}")
+            pet_info = Pet.objects.get(id=pet_id)
+            print(f"pet info: {pet_info.__dict__}")
+            result = process_target_pet(pet_id)
             return Response({'results': result}, status=200)
         except Exception as e:
             return Response({'error': str(e)}, status=400)

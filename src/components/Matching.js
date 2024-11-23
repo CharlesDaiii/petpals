@@ -1,19 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/Matching.css";
-
-const profiles = [
-    { name: "Kiwi", breed: "Yorkshire Terrier", age: 7, weight: 8, distance: 5 },
-    { name: "Cake", breed: "Welsh Corgi", age: 2, weight: 10, distance: 36.8 },
-    { name: "Buddy", breed: "Golden Retriever", age: 3, weight: 70, distance: 10 },
-    { name: "Max", breed: "Labrador", age: 4, weight: 65, distance: 12 },
-    { name: "Bella", breed: "Poodle", age: 5, weight: 50, distance: 8 },
-    { name: "Charlie", breed: "Beagle", age: 6, weight: 25, distance: 15 },
-    { name: "Lucy", breed: "Bulldog", age: 3, weight: 40, distance: 20 },
-    { name: "Daisy", breed: "Boxer", age: 4, weight: 60, distance: 18 }
-];
+import getCSRFToken from './getCSRFToken';
 
 export const Matching = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [userPet, setUserPet] = useState(null);
+    const [profiles, setProfiles] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const authResponse = await fetch(`${process.env.REACT_APP_BACKEND}/auth/redirect/`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+                
+                if (!authResponse.ok) throw new Error('Not logged in');
+                const authData = await authResponse.json();
+                if (!authData.is_authenticated) throw new Error('Not logged in');
+                
+                setCurrentUser(authData.user);
+
+                const petResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/match-pet/`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+                
+                if (!petResponse.ok) throw new Error('Failed to fetch pet data');
+                const petData = await petResponse.json();
+                if (!petData) throw new Error('No pet data found');
+                
+                setUserPet(petData);
+
+                const profilesResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/matching/`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+                
+                if (!profilesResponse.ok) throw new Error('Failed to fetch sorted profiles');
+                const sortedProfiles = await profilesResponse.json();
+
+                setProfiles(sortedProfiles.results);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                if (error.message === 'Not logged in') {
+                    window.location.href = '/Register?next=/Matching';
+                }
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    // Add sort by distance function
+    const handleSortByDistance = () => {
+        const sortedProfiles = [...profiles].sort((a, b) => a.distance - b.distance);
+        setProfiles(sortedProfiles);
+        setCurrentIndex(0);
+        console.log('Sorted by distance', sortedProfiles);
+    };
+
+    const handleSortByMatch = () => {
+        const sortedProfiles = [...profiles].sort((a, b) => {
+            return b.matchScore - a.matchScore; 
+        });
+        setProfiles(sortedProfiles);
+        setCurrentIndex(0);
+        console.log('Sorted by match', sortedProfiles);
+    };
 
     const showPreviousProfile = () => {
         setCurrentIndex((prevIndex) => (prevIndex - 1 + profiles.length) % profiles.length);
@@ -24,51 +83,135 @@ export const Matching = () => {
     };
 
     const getProfile = (index) => {
-        return profiles[(currentIndex + index) % profiles.length];
+        if (!profiles.length) return null;
+        const profile = profiles[(currentIndex + index) % profiles.length];
+        return {
+            ...profile,
+            matchScore: calculateMatchScore(userPet, profile)
+        };
+    };
+
+    const getCardPosition = (index) => {
+        const diff = (index - currentIndex + profiles.length) % profiles.length;
+        if (diff === 0) return 'center';
+        if (diff === 1) return 'right';
+        if (diff === profiles.length - 1) return 'left';
+        return 'hidden';
+    };
+
+    const handleWagClick = async (profileId) => {
+        if (!profileId) {
+            console.error('Profile ID is undefined');
+            return;
+        }
+
+        try {
+
+            const isFollowing = profiles.find(p => p.id === profileId)?.isFollowing;
+            const endpoint = isFollowing ? 'unfollow-pet' : 'follow-pet';
+
+            const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/${endpoint}/${profileId}/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to ${isFollowing ? 'unfollow' : 'follow'} pet: ${response.status} ${errorText}`);
+            }
+
+            const data = await response.json();
+            
+            const updatedProfiles = profiles.map(profile => {
+                if (profile.id === profileId) {
+                    return { ...profile, isFollowing: !isFollowing };
+                }
+                return profile;
+            });
+            setProfiles(updatedProfiles);
+            console.log(`Successfully ${isFollowing ? 'unfollowed' : 'followed'} pet`, profileId);
+        } catch (error) {
+            console.error('Error:', error);
+            alert(`Unable to ${isFollowing ? 'unfollow' : 'follow'} pet: ${error.message}. Please try again or contact support if the issue persists.`);
+        }
     };
 
     return (
         <div className="matching-container">
-            <div className="controls">
-                <button className="sort-button">Sort by destination</button>
-                <button className="filter-button">Filter</button>
-            </div>
+            {
+            isLoading ? (
+                <div>Loading...</div>
+            ) : !userPet ? (
+                <div className="no-pet-message">
+                    <h2>Please set up your pet profile first</h2>
+                    <button onClick={() => window.location.href = '/ProfileSignUp'}>
+                        Set Up Profile
+                    </button>
+                </div>
+            ) : profiles.length === 0 ? (
+                <div className="no-matches-message">
+                    <h2>No matches found</h2>
+                    <p>Check back later for new potential matches!</p>
+                </div>
+            ) : 
+            (
+                <>
+                    <div className="controls">
+                        <button className="sort-button" onClick={handleSortByDistance}>
+                            Sort by distance
+                        </button>
+                        <button className="sort-button" onClick={handleSortByMatch}>
+                            Sort by match
+                        </button>
+                    </div>
 
-            <div className="profile-card small">
-                <div className="profile-image" />
-                <div className="profile-name">{getProfile(0).name}</div>
-                <p className="profile-details">
-                    {getProfile(0).breed}, {getProfile(0).age} years old, {getProfile(0).weight} lbs
-                    <br />
-                    {getProfile(0).distance} miles away from you
-                </p>
-                <button className="wag-button">Wag your tail</button>
-            </div>
+                    <div className="cards-container">
+                            {profiles.map((profile, index) => {
+                                const position = getCardPosition(index);
+                                if (position === 'hidden') return null;
 
-            <div className="profile-card large">
-                <div className="profile-image" />
-                <div className="profile-name">{getProfile(1).name}</div>
-                <p className="profile-details">
-                    {getProfile(1).breed}, {getProfile(1).age} years old, {getProfile(1).weight} lbs
-                    <br />
-                    {getProfile(1).distance} miles away from you
-                </p>
-                <button className="wag-button">Wag your tail</button>
-            </div>
+                                const { photos = [], name, breed, age, weight, distance } = profile; 
 
-            <div className="profile-card small">
-                <div className="profile-image" />
-                <div className="profile-name">{getProfile(2).name}</div>
-                <p className="profile-details">
-                    {getProfile(2).breed}, {getProfile(2).age} years old, {getProfile(2).weight} lbs
-                    <br />
-                    {getProfile(2).distance} miles away from you
-                </p>
-                <button className="wag-button">Wag your tail</button>
-            </div>
+                                return (
+                                    <div 
+                                        key={index}
+                                        className={`profile-card ${position}`}
+                                    >
+                                        <div className="match-score">
+                                            {/* Match: {calculateMatchScore(userPet, profile)}% */}
+                                            Match: {profile.matchScore}%
+                                        </div>
+                                        <img
+                                            src={photos.length > 0 ? photos[0] : 'default-avatar.png'} 
+                                            alt={`${name}'s photo`}
+                                            className="profile-photo"
+                                        />
+                                        <div className="profile-name">{name}</div>
+                                        <p className="profile-details">
+                                            {breed}, {age} years old, {weight} lbs
+                                            <br />
+                                            {distance} miles away from you
+                                        </p>
+                                        <button 
+                                            className="wag-button"
+                                            onClick={() => handleWagClick(profile.id)}
+                                        >
+                                            {profile.isFollowing ? 'Wagging!' : 'Wag your tail'}
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
 
-            <button className="arrow left-arrow" onClick={showPreviousProfile}>{"<"}</button>
-            <button className="arrow right-arrow" onClick={showNextProfile}>{">"}</button>
+                    <button className="arrow left-arrow" onClick={showPreviousProfile}>{"<"}</button>
+                    <button className="arrow right-arrow" onClick={showNextProfile}>{">"}</button>
+                </>
+            )}
         </div>
     );
 };
