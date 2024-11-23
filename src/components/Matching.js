@@ -82,15 +82,6 @@ export const Matching = () => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % profiles.length);
     };
 
-    const getProfile = (index) => {
-        if (!profiles.length) return null;
-        const profile = profiles[(currentIndex + index) % profiles.length];
-        return {
-            ...profile,
-            matchScore: calculateMatchScore(userPet, profile)
-        };
-    };
-
     const getCardPosition = (index) => {
         const diff = (index - currentIndex + profiles.length) % profiles.length;
         if (diff === 0) return 'center';
