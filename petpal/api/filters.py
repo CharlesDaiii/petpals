@@ -44,7 +44,6 @@ def filter_by_time_range(pets, target_time):
     
     target_index = valid_choices.index(target_time)
 
-    print("pet_data, ", pets[0])
     filtered_pets = [
         pet_data for pet_data in pets
         if abs(valid_choices.index(pet_data['preferred_time']) - target_index) <= 1
@@ -103,7 +102,6 @@ def apply_filters(pets, target_pet):
 def get_full_prompt(target_pet, pets_data):
     target_pet = json.dumps(target_pet, indent=4)
     pets_data = json.dumps(pets_data, indent=4)
-    print("friends pets_data", pets_data)
     return f"""
     Return Format:
     [
@@ -126,7 +124,7 @@ def get_full_prompt(target_pet, pets_data):
     - Same preferred time add 10.0 points.
     - The more sharing or similar characters, the higher the score. Adds 0.0 to 20.0 points.
     - The closer the location, the higher the score, adding points from 0.0 to 20.0. If the city is not the same, the score will be reduced by 20.0 points.
-    - According to the red flags, focus on the targeted pet's red flags. If the characters or other attributes of a pet matches the targeted pet's red flags, the score will be reduced. The more things match, the lower the score. The score will be reduced by 0.0 to 20.0 points.
+    - According to the red flags, focus on the targeted pet's red flags. If the characters or other attributes of a pet matches the targeted pet's red flags, the score will be reduced. The more things match, the lower the score. The score will be reduced by 0.0 to 20.0 points.Do not compare one's red flags with another's red flags!!!
     - Provide a **detailed explanation** for each score, including:
         - Matching or similar characters.
         - Location relevance (same area or not).
@@ -172,7 +170,6 @@ def ask(target_pet, pets_data):
     fullcode = get_full_prompt(target_pet, pets_data)
     response = get_model_json("gpt-3.5-turbo-0125", fullcode) # alternative: gpt-4o-mini, gpt-4o
     string = response.choices[0].message.content
-    print("pet string", string)
 
     try:
             json_load = json.loads(string)
@@ -216,49 +213,8 @@ def id_to_display(matching_pets, target_pet, user_id):
     #     if isinstance(pet, dict) and "fields" in pet:
     #         cleaned_target_pet = pet["fields"]
     
-    print("cleaned target_pet", target_pet)
         
     target_location = target_pet["location"]
-    print("ready to process matching_pets")
-    print("matching_pets", matching_pets)
-
-    # for json data
-    # for pet_id, pet_data in json_load.items():
-    #     try:
-    #         score = pet_data["score"]
-    #         reason = pet_data["reason"]
-
-    #         with open(file_path, 'r') as f:
-    #             pets_data = json.load(f)
-            
-    #         pet = pets_data[pet_id]
-
-    #         print("ready to process pet")
-
-    #         name = pet["name"]
-    #         breed = pet["breed"]
-    #         birth_date = datetime.strptime(pet["birth_date"], '%Y-%m-%d')
-    #         weight = pet["weight"]
-    #         pet_location = pet["location"]
-    #         photo = pet.get("photo")
-            
-
-    #         age = calculate_age(birth_date)
-    #         distance = calculate_distance(target_location, pet_location)
-
-    #         pet_details.append({
-    #             "id": pet_id,
-    #             "name": name,
-    #             "breed": breed,
-    #             "age": age,
-    #             "weight": weight,
-    #             "distance": round(distance, 2),
-    #             "photo": photo,
-    #             "score": score,
-    #             "reason": reason,
-    #         })
-
-    #         print("add pet" + pet_id + name)
 
     # for database data
     for pet_data in matching_pets:
@@ -269,6 +225,7 @@ def id_to_display(matching_pets, target_pet, user_id):
             
             pet = Pet.objects.get(id=pet_id)
             print(f"pet {pet_id}", pet)
+            # print(f"pet {pet_id}", pet, score, reason)
 
             pet_location = pet.location
             distance = calculate_distance(target_location, pet_location)
@@ -317,7 +274,6 @@ def process_target_pet(target_pet_id, user_id):
 
         filtered_pets = apply_filters(filtered_pets, target_pet)
         gpt_result = ask(target_pet, filtered_pets)
-        print("finished asking", gpt_result)
         
         detailed_results = id_to_display(gpt_result, target_pet, user_id)
         return detailed_results
