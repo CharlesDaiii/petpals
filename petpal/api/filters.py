@@ -14,6 +14,11 @@ def calculate_distance(start, end):
     distance = gmaps.distance_matrix(start, end)
     return distance['rows'][0]['elements'][0]['distance']['value'] / 1609.34 # convert to miles
 
+def calculate_distance_score(distance, max_distance=50, max_score=20):
+    if distance > max_distance:
+        return 0
+    return round(max_score * (1 - distance / max_distance), 1)
+
 def calculate_age(birth_date):
     today = datetime.now()
     years = today.year - birth_date.year
@@ -99,40 +104,60 @@ def apply_filters(pets, target_pet):
 def get_full_prompt(target_pet, pets_data):
     target_pet = json.dumps(target_pet, indent=4)
     pets_data = json.dumps(pets_data, indent=4)
-    return f"""
-    Return Format:
-    [
-        {{
-            "id": "pet id",
-            "score": "total score",
-            "reason": "reason for the score"
-        }},
-        ...
-    ]
-
-    Note:
-    - Return only the JSON object for easy parsing.
-    - For each entry, ensure provide: id, score and reason.
-
+    return f"""    
+    Please sort the following pets for the targeted pet by calculating a total score based on the refined criteria below:
     Rules:
-    Please sort the following pets for the targeted pet by calculating a total score based on the following criteria:
-    1. The score is between 0.0 and 100.0, with higher scores indicating a better match. The following situations will help higher scores:
-    - Same or similar breed adds 10.0 to 20.0 points.
-    - Same preferred time add 10.0 points.
-    - The more sharing or similar characters, the higher the score. Adds 0.0 to 20.0 points.
-    - The closer the location, the higher the score, adding points from 0.0 to 20.0. If the city is not the same, the score will be reduced by 20.0 points.
-    - According to the red flags, focus on the targeted pet's red flags. If the characters or other attributes of a pet matches the targeted pet's red flags, the score will be reduced. The more things match, the lower the score. The score will be reduced by 0.0 to 20.0 points.Do not compare one's red flags with another's red flags!!!
-    - Provide a **detailed explanation** for each score, including:
-        - Matching or similar characters.
-        - Location relevance (same area or not).
-        - Mention which character or characters conflicts with targeted dog's red flags and how they affected the score.
-    - Return pets from high score to low and resolve ties in score by prioritizing pets with fewer red flags.
-    2. The total score should be rounded to one decimal place, from 0.0 to 100.0, not too tidy with the data.
+    1. The score ranges between 0.0 and 80.0, with higher scores indicating better matches. The calculation should be precise and include decimal points (e.g., 76.5 or 48.3). Scores above 70 should reflect highly compatible pets, and scores above 75 should be reserved for exceptionally close matches.
+    
+    2. Scoring criteria:
+        - **Breed Similarity (25%, 20 points)**:
+            - Identical breed: add 20.0 points.
+            - Highly similar breed (e.g., same breed group): add 16.0 to 18.0 points.
+            - Moderately similar breed: add 10.0 to 15.0 points.
+            - Different breed: add 0.0 points.
 
-    About "red flags":
-    - "Red flags" do not describe the attributes of a pet itself.
-    - Instead, they indicate behaviors or attributes that mean the pet does not want to interact with other pets having those attributes.
-    - For example, a red flag "Big Dog" on a pet means the pet does not prefer to play with larger dogs.
+        - **Character Compatibility (25%, 20 points)**: 
+            - Identical characters: add 20.0 points.
+            - Highly compatible characters (e.g., Friendly vs Playful): add 16.0 to 18.0 points.
+            - Partially compatible characters (e.g., Friendly vs Independent): add 10.0 to 15.0 points.
+
+        - **Dog-Walking Time Match (30%, 24 points)**:
+            - Completely matching: add 24.0 points.
+            - Partially overlapping times (e.g., morning vs afternoon): add 18.0 to 22.0 points.
+            - Completely different: add 10.0 to 15.0 points. If breed and character compatibility are high, even different times can still score a minimum of 10 points.
+
+        - **Red Flag Conflicts (5%, -4 points)**:
+            - No conflicts: deduct 0.0 points.
+            - Minor conflicts (e.g., 1 red flag): deduct 2.0 points.
+            - Severe conflicts (e.g., 2 or more red flags): deduct 3.0 to 4.0 points.
+    
+    3. When evaluating red flags, consider only the red flags of the targeted pet. Compare these red flags to the attributes of the matching pets (e.g., breed, character, or behavior). Do not compare the red flags of one pet to another's.
+        For example:
+        - If the targeted pet has a red flag "Big Dog," reduce the score if the matching pet is a large breed.
+        - If the targeted pet has a red flag "Barks a Lot," reduce the score if the matching pet's behavior suggests frequent barking.
+
+        Red flags represent specific constraints or preferences of the targeted pet. You do not need to handle user-defined red flags at this time.
+
+    4. For each pet, provide:
+        - `id`: The unique identifier of the pet.
+        - `score`: The calculated score rounded to one decimal place.
+        - `reason`: A concise explanation of the score, covering:
+            - Breed similarity.
+            - Character compatibility.
+            - Dog-walking time overlap.
+            - Location proximity or distance penalties.
+            - Any red flag conflicts.
+            - Example: \"Breed similar (+20.5), same time (+30.0), no conflicts (0.0).\"
+    
+    5. Return Format:
+        [
+            {{
+                "id": "pet id",
+                "score": "total score",
+                "reason": "reason for the score"
+            }},
+            ...
+        ]
 
     The targeted pet's information is as follows:
     {target_pet}
@@ -140,7 +165,7 @@ def get_full_prompt(target_pet, pets_data):
     The pets to consider for friendship are as follows:
     {pets_data}
 
-    Return the filtered and prioritized result strictly in the JSON format specified above.
+    Please return the results as a JSON object, sorted by highest score first, resolving ties by prioritizing pets with fewer red flag conflicts.
     """
 
 def get_model_json(model_name: str, fullcode:str, stream: bool = False):
@@ -221,11 +246,22 @@ def id_to_display(matching_pets, target_pet, user_id):
             reason = pet_data["reason"]
             
             pet = Pet.objects.get(id=pet_id)
-            print(f"pet {pet_id}", pet)
+            print(f"pet {pet_id}", pet, score)
             # print(f"pet {pet_id}", pet, score, reason)
 
             pet_location = pet.location
             distance = calculate_distance(target_location, pet_location)
+            
+            if distance > 50:
+                print(f"Skipping pet {pet_id} due to distance of {distance} miles.")
+                continue
+
+            distance_score = calculate_distance_score(distance)
+            if isinstance(score, str):
+                score = float(score)
+            final_score = round(score + distance_score, 1)
+            reason = reason.rstrip(".")
+            reason = f"{reason}, distance ({distance_score:.1f} points)."
 
             pet_details.append({
                 "id": pet.id,
@@ -235,7 +271,7 @@ def id_to_display(matching_pets, target_pet, user_id):
                 "weight": pet.weight,
                 "distance": round(distance, 1),
                 "photos": pet.photos,
-                "matchScore": score,
+                "matchScore": final_score,
                 "reason": reason,
                 "isFollowing": pet.followers.filter(id=user_id).exists()
             })

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../styles/Matching.css";
 import getCSRFToken from './getCSRFToken';
 import Loading from './Loading';
@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 
 export const Matching = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [currentUser, setCurrentUser] = useState(null);
     const [userPet, setUserPet] = useState(null);
     const [profiles, setProfiles] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -15,6 +14,9 @@ export const Matching = () => {
     const [isLogin, setIsLogin] = useState(false);
     const [username, setUsername] = useState("");
     const [showMenu, setShowMenu] = useState(false);
+    const [fetchCount, setFetchCount] = useState(0);
+    const isFetchingRef = useRef(false);
+    const maxFetchAttempts = 3;
 
     const handleTransition = () => {{
         setIsTransitioning(false);
@@ -53,53 +55,58 @@ export const Matching = () => {
             .catch((err) => console.error("Logout error:", err));
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const authResponse = await fetch(`${process.env.REACT_APP_BACKEND}/auth/redirect/`, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-                
-                if (!authResponse.ok) throw new Error('Not logged in');
-                const authData = await authResponse.json();
-                if (!authData.is_authenticated) throw new Error('Not logged in');
-                
-                setCurrentUser(authData.user);
-                setIsLogin(true);
-                setUsername(authData.username);
+    const fetchData = async () => {
+        console.log("Fetching data...");
+        if (isFetchingRef.current || fetchCount >= maxFetchAttempts) {
+            console.log(`Fetching data... ${isFetchingRef.current ? 'fetching' : fetchCount}`);
+            return;
+        }
 
-                const petResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/match-pet/`, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-                
-                if (!petResponse.ok) throw new Error('Failed to fetch pet data');
-                const petData = await petResponse.json();
-                if (!petData) throw new Error('No pet data found');
-                
-                setUserPet(petData);
+        isFetchingRef.current = true;
+        try {
+            console.log(`Fetching attempt ${fetchCount + 1}...`);
 
-                const profilesResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/matching/`, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-                
-                if (!profilesResponse.ok) throw new Error('Failed to fetch sorted profiles');
-                const sortedProfiles = await profilesResponse.json();
-
-                setProfiles(sortedProfiles.results);
-                             
-            } catch (error) {
-                console.error('Error:', error);
-                if (error.message === 'Not logged in') {
-                    window.location.href = '/Register?next=/Matching';
-                }
-            } finally {
-                setIsLoading(false);
+            const petResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/match-pet/`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+            
+            if (petResponse.status === 401) {
+                throw new Error(petResponse.status);
             }
-        };
 
+            const data = await petResponse.json();
+            setIsLogin(true);
+            setUsername(data.user.username);
+            
+            if (!data.pet) throw new Error('No pet data found');
+            setUserPet(data.pet);
+
+            const profilesResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/matching/`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+            
+            if (!profilesResponse.ok) throw new Error('Failed to fetch sorted profiles');
+            const sortedProfiles = await profilesResponse.json();
+            setProfiles(sortedProfiles.results);
+            
+        } catch (error) {
+            console.error('Error:', error);
+            if (error.message === '401') {
+                window.location.href = '/Register?next=/Matching';
+            } else {
+                alert(`Error code: ${error.message}`);
+            }
+        } finally {
+            isFetchingRef.current = false;
+            setFetchCount((prevCount) => prevCount + 1);
+            setIsLoading(false);
+            console.log(`Data fetched. Attempt ${fetchCount + 1}`);
+        }
+    };
+
+    useEffect(() => {
         fetchData();
     }, []);
 
@@ -209,14 +216,16 @@ export const Matching = () => {
                 </button>
             </header>
 
-            {isTransitioning ? (
+            {isLoading ? (
+                isTransitioning ? (
                 <div className="transition-overlay">
                     <Transition onFinish={handleTransition} /> 
                 </div>
-            ) : isLoading ? (
+                ) : (
                 <div>
                     <Loading />
                 </div>
+                )
             ) : !userPet ? (
                 <div className="no-pet-message">
                     <h2>Please set up your pet profile first</h2>
@@ -253,7 +262,7 @@ export const Matching = () => {
                                         Match: {profile.matchScore}%
                                     </div>
                                     <img
-                                        src={photos.length > 0 ? photos[0] : 'default-avatar.png'}
+                                        src={photos.length > 0 ? photos[0] : '/image/default.png'}
                                         alt={`${name}'s photo`}
                                         className="profile-photo"
                                     />

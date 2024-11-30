@@ -50,7 +50,7 @@ class Pet(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.photos:
-            self.photos = [getattr(settings, 'DEFAULT_PHOTO_URL', 'http://localhost:8000/media/photos/default.jpg')]
+            self.photos = ['/image/default.png']
         super().save(*args, **kwargs)
     
     @property

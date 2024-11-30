@@ -167,7 +167,10 @@ def calculate_distance(start, end):
 def match_pet(request):
     try:
         user_pet = Pet.objects.get(owner=request.user)
-        return Response({
+        user_data = {
+            'username': request.user.username,
+        }
+        pet_data = {
             'id': user_pet.id,
             'name': user_pet.name,
             'breed': user_pet.breed,
@@ -180,12 +183,18 @@ def match_pet(request):
             'characters': user_pet.characters,
             'red_flags': user_pet.red_flags,
             'photos': user_pet.photos,
+        }
+        return Response({
+            'user': user_data,
+            'pet': pet_data
         })
+    
     except Pet.DoesNotExist:
         return Response({'error': 'Pet not found'}, status=404)
     except Exception as e:
         return Response({'error': str(e)}, status=500)
 
+# temporary unused
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_pet(request):
@@ -209,7 +218,6 @@ def get_user_pet(request):
         return Response({'error': 'No pet found'}, status=404)
     except UserProfile.DoesNotExist:
         return Response({'error': 'User profile not found'}, status=404)
-
 
 @login_required
 def matching_redirect(request):
@@ -335,7 +343,8 @@ def get_following(request):
                 followed_pet = Pet.objects.get(owner=followed_user)
                 following_data.append({
                     'id': followed_pet.id,
-                    'name': followed_pet.name
+                    'name': followed_pet.name,
+                    'photo': followed_pet.photos[0] if followed_pet.photos else None
                 })
             except Pet.DoesNotExist:
                 continue
@@ -394,7 +403,8 @@ def get_followers(request):
                     'hasWaggedBack': WagHistory.objects.filter(
                         wagger=request.user,
                         wagged_to=follower
-                    ).exists()
+                    ).exists(),
+                    'photo': follower_pet.photos[0] if follower_pet.photos else None
                 })
             except Pet.DoesNotExist:
                 continue
