@@ -66,7 +66,7 @@ def filter_by_hard_red_flags(pets, target_pet):
     filtered_pets = pets
     # "Big Dog"
     red_flags = target_pet["red_flags"]
-    print("red_flags: ", red_flags)
+
     if "Big Dog" in red_flags:
         filtered_pets = [
             pet_data for pet_data in filtered_pets
@@ -285,18 +285,20 @@ def id_to_display(matching_pets, target_pet, user_id):
 # --- main method ---
 def process_target_pet(target_pet_id, user_id):
     try:
-        target_pet = serialize('json', Pet.objects.filter(id=target_pet_id))
-        target_pet = json.loads(target_pet)
-        pet = target_pet[0]
-        target_pet = pet["fields"]
-        
-        pets_data = serialize('json', Pet.objects.exclude(id=target_pet_id))
-        pets_data = json.loads(pets_data)
+        target_pet = Pet.objects.filter(id=target_pet_id).first()
+        following_pet_ids = target_pet.following.all().values_list('id', flat=True)
+        pets = Pet.objects.exclude(id=target_pet_id).exclude(id__in=following_pet_ids)
+
+        target_pet = serialize('json', [target_pet])
+        target_pet = json.loads(target_pet)[0]["fields"]
+
         fields_with_id = []
-        for pet in pets_data:
-            if "fields" in pet:
-                pet_data = pet["fields"].copy()
-                pet_data["id"] = pet["pk"]
+
+        for pet_instance in pets:
+            if pet_instance.id not in following_pet_ids:
+                pet_data = serialize('json', [pet_instance])
+                pet_data = json.loads(pet_data)[0]["fields"]
+                pet_data["id"] = pet_instance.id
                 fields_with_id.append(pet_data)
 
         filtered_pets = fields_with_id
