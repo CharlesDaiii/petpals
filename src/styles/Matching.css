@@ -298,7 +298,7 @@
     color: white;
 }
 
-/* 基础箭头样式 */
+/* default arrow style */
 .arrow {
     position: absolute;
     top: 50%;
@@ -321,7 +321,7 @@
     transform: translateY(-50%) scale(1.1);
 }
 
-/* 默认大屏幕布局 */
+/* default large screen layout */
 .left-arrow {
     left: 5vw;
 }
@@ -330,7 +330,7 @@
     right: 5vw;
 }
 
-/* 响应式调整 */
+/* responsive adjustment */
 @media (max-width: 1400px) {
     .left-arrow {
         left: 4vw;
@@ -451,7 +451,7 @@
 
 
 
-/* 添加Header样式 */
+/* add header style */
 header.AppHeader {
     display: flex;
     justify-content: flex-end;

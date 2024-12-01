@@ -130,20 +130,20 @@ body {
     text-align: left;
 }
 
-/* 响应式调整 */
+/* responsive adjustment */
 @media (max-width: 768px) {
     .form-grid {
         grid-template-columns: 1fr;
     }
 }
 
-/* 普通输入框样式 - 移除下拉箭头 */
+/* default input style - remove dropdown arrow */
 input.input-field {
     background-image: none;
     padding-right: 10px;  /* 恢复正常padding */
 }
 
-/* 添加header样式 */
+/* add header style */
 .profile-header {
     position: fixed;
     top: 0;
@@ -157,7 +157,7 @@ input.input-field {
     align-items: center;
 }
 
-/* 错误消息样式 */
+/* error message style */
 .error-message {
     color: #ff4d4f;
     font-size: 12px;
@@ -167,13 +167,13 @@ input.input-field {
     left: 0;
 }
 
-/* 表单容器样式 */
+/* form container style */
 .form-field-container {
     position: relative;
     margin-bottom: 24px;
 }
 
-/* Next按钮容器样式 */
+/* Next button container style */
 .button-container {
     display: flex;
     justify-content: center;
@@ -203,14 +203,14 @@ input.input-field {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* 响应式调整 */
+/* responsive adjustment */
 @media (max-width: 768px) {
     .form-grid {
         grid-template-columns: 1fr;
     }
 }
 
-/* 普通输入框样式 - 移除下拉箭头 */
+/*  default input style - remove dropdown arrow */
 input.input-field {
     background-image: none;
     padding-right: 10px;  /* 恢复正常padding */
@@ -248,7 +248,7 @@ input.input-field {
 
 
 
-/* 增加特异性并使 !important 来确保样式优先级 */
+/* increase specificity and use !important to ensure style priority */
 header.AppHeader {
     display: flex;
     justify-content: flex-end;
@@ -262,12 +262,12 @@ header.AppHeader {
     width: 100%;
 }
 
-/* 移除可能影响的其他 header 样式 */
+/* remove other header styles that may affect */
 .profile-header {
-    display: none; /* 禁用其他 header 样式 */
+    display: none; /* disable other header styles */
 }
 
-/* 移除其他可能影响的样式 */
+/* remove other header styles that may affect */
 .header {
     background: none;
 }
@@ -287,7 +287,7 @@ header.AppHeader {
     border-color: #d9d9d9;
 }
 
-/* 输入框基础样式 */
+/* default input style */
 .input-field, .select__control {
     background: white;
     border: 1px solid #d9d9d9;
@@ -301,7 +301,7 @@ header.AppHeader {
     text-align: left;
 }
 
-/* 确保下拉框和日期选择器也保持一致的高度 */
+/* ensure dropdown and date picker also maintain the same height */
 select.input-field {
     height: 64px;
 }
