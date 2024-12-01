@@ -36,13 +36,15 @@ const Friends = () => {
       await updateData('/api/followers/', (data) => setFollowers(data.followers));
       await updateData('/api/following/', (data) => setFollowing(data.following));
     }, 5000);
-    return intervalId;  // 返回 intervalId
+    return intervalId;
   };
 
   useEffect(() => {
     fetchUserData();
-    const intervalId = startUpdating();  // 获取 intervalId
-    return () => clearInterval(intervalId);  // 清除 intervalId
+    updateData('/api/followers/', (data) => setFollowers(data.followers));
+    updateData('/api/following/', (data) => setFollowing(data.following));
+    const intervalId = startUpdating();
+    return () => clearInterval(intervalId);
   }, []);
 
   // Fetch login state and username
