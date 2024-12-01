@@ -35,6 +35,7 @@ urlpatterns = [
     path('api/unfollow-pet/<int:pet_id>/', views.unfollow_pet, name='unfollow-pet'),
     path('api/wag-back/<int:follower_id>/', views.wag_back, name='wag-back'),
     path('api/update-pet/', views.update_pet, name='update-pet'),
+    path('api/user-pet/<int:id>/', views.get_other_pet, name='get-other-pet'),
 ]
 
 if settings.DEBUG:  
