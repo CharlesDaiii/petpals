@@ -46,7 +46,7 @@ class Pet(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.photos:
-            self.photos = ['/image/default.png']
+            self.photos = ['/static/image/default.png']
         super().save(*args, **kwargs)
 
     @classmethod

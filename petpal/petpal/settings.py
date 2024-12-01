@@ -112,7 +112,14 @@ USE_TZ = True
 
 # ========== Static and Media Files ========== #
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "static"
+
+STATICFILES_DIRS = [
+    BASE_DIR.parent / "build/static",
+    BASE_DIR.parent / "build",
+]
+
+# STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # DEFAULT_PHOTO_URL = 'https://my-bucket.s3.amazonaws.com/default.jpg'
 DEFAULT_PHOTO_URL = f"{STATIC_URL}image/default.png"

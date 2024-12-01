@@ -43,10 +43,10 @@ def oauth_redirect(request):
                          "username": request.user.username,
                          }, status=200)
 
-# Custom redirect
-@login_required
-def profileSignUp(request):
-    return redirect(f'{settings.FRONTEND_URL}/ProfileSignUp')
+# # Custom redirect
+# @login_required
+# def profileSignUp(request):
+#     return redirect(f'{settings.FRONTEND_URL}/ProfileSignUp')
 
 @login_required
 def api_logout(request):
@@ -170,9 +170,9 @@ def get_user_pet(request):
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 
-@login_required
-def matching_redirect(request):
-    return redirect(f"{settings.FRONTEND_URL}/Matching")
+# @login_required
+# def matching_redirect(request):
+#     return redirect(f"{settings.FRONTEND_URL}/Matching")
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
