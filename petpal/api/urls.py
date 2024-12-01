@@ -24,7 +24,6 @@ urlpatterns = [
     # path('api/matching/', views.MatchingAPIView.as_view(), name='matching'),
     path('Matching/', views.matching_redirect, name='matching_redirect'),
     path('api/matching/', views.matching, name='matching'),
-    path('api/user-pet/', views.get_user_pet, name='user-pet'),
     path('api/match-pet/', views.match_pet, name='match_pet'),
     path('api/upload-photos/', views.upload_photos, name='upload-photos'),  
     path('api/user-pet/', views.get_user_pet, name='get_user_pet'),

@@ -1,8 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.conf import settings
 from django.core.exceptions import ValidationError
-
 
 class Pet(models.Model):
     id = models.AutoField(primary_key=True)
@@ -163,6 +161,5 @@ class Pet(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    pet = models.OneToOneField(Pet, on_delete=models.CASCADE, blank=True, null=True)
     def __str__(self):
         return self.user.username

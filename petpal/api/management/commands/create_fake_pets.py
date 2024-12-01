@@ -389,9 +389,4 @@ class Command(BaseCommand):
                 **pet_data
             )
 
-            user_profile = UserProfile.objects.create(
-                pet=pet,
-                user=test_user
-            )
-
             self.stdout.write(f"Created pet: {pet.name} with owner: {test_user.username}")

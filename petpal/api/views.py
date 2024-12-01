@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Pet, UserProfile
+from .models import Pet
 from .forms import PetForm, RegisterForm
 from .serializers import PetSerializer
 from .filters import process_target_pet
@@ -23,7 +23,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import Pet, UserProfile
+from .models import Pet
 
 # --- authentication methods ---
 # Custom login required decorator, return json response
@@ -161,13 +161,14 @@ def match_pet(request):
 @permission_classes([IsAuthenticated])
 def get_user_pet(request):
     try:
-        user_profile = UserProfile.objects.get(user=request.user)
-        if user_profile.pet:
-            return Response(user_profile.pet.get_data(), status=200)
+        pet = Pet.objects.filter(owner=request.user).first()
+        if not pet:
+            return Response({"error": "No pet found for the current user."}, status=404)
 
-        return Response({'error': 'No pet found'}, status=404)
-    except UserProfile.DoesNotExist:
-        return Response({'error': 'User profile not found'}, status=404)
+        pet_data = pet.get_data()
+        return Response(pet_data, status=200)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
 
 @login_required
 def matching_redirect(request):
@@ -177,13 +178,13 @@ def matching_redirect(request):
 @permission_classes([IsAuthenticated])
 def matching(request):
     try:
-        user_profile = UserProfile.objects.get(user=request.user)
+        user_pet = Pet.objects.get(owner=request.user)
         
-        if not user_profile.pet or not user_profile.pet.location:
-            print("No pet or location found for user")
+        if not user_pet.location:
+            print("No pet location found for user")
             return Response({'error': 'User pet location not found'}, status=400)
 
-        result = process_target_pet(user_profile.pet.id, request.user.id)
+        result = process_target_pet(user_pet.id, request.user.id)
         return JsonResponse({'results': result}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
@@ -390,9 +391,8 @@ def wag_back(request, follower_id):
 @permission_classes([IsAuthenticated])
 def check_pet_exists(request):
     try:
-        user_profile = UserProfile.objects.filter(user=request.user).first()
-        has_pet = user_profile and user_profile.pet is not None
-        return Response({"has_pet": has_pet}, status=200)
+        pet_exists = Pet.objects.filter(owner=request.user).exists()
+        return Response({"has_pet": pet_exists}, status=200)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 
@@ -401,15 +401,12 @@ def check_pet_exists(request):
 def update_pet(request):
     try:
         pet_data = request.data
-        user_profile = UserProfile.objects.get(user=request.user)
-        pet = user_profile.pet
+        pet = Pet.objects.get(owner=request.user) 
         pet.update_pet(pet_data)
 
         return Response({'message': 'Pet profile updated successfully'}, status=200)
     except Exception as e:
         return Response({'error': str(e)}, status=400)
-    except UserProfile.DoesNotExist:
-        return Response({'error': 'User profile not found'}, status=404)
     except Pet.DoesNotExist:
         return Response({'error': 'Pet not found'}, status=404)
     except Exception as e:
