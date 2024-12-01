@@ -369,18 +369,6 @@ class Command(BaseCommand):
                 "characters": "Gentle, Calm, Independent",
                 "red_flags": "Big Dog"
             },
-            {
-                "name": "kiki",
-                "sex": "Female",
-                "preferred_time": "Afternoon",
-                "breed": "Eskimo",
-                "birth_date": "2019-09-09",
-                "location": "5819 Centre Ave, Pittsburgh, PA 15206",
-                "weight": 16.8,
-                "health_states": "rabies, influenza, dhlpp, bordetella",
-                "characters": "Friendly, Curious, Active",
-                "red_flags": "Aggressive, Not Trained, Not Neutered"
-            },
         ]
 
         for pet_data in fake_pets:
@@ -400,4 +388,10 @@ class Command(BaseCommand):
                 owner=test_user,
                 **pet_data
             )
+
+            user_profile = UserProfile.objects.create(
+                pet=pet,
+                user=test_user
+            )
+
             self.stdout.write(f"Created pet: {pet.name} with owner: {test_user.username}")
