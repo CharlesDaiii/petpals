@@ -6,63 +6,67 @@ import { useNavigate } from "react-router-dom";
 const Friends = () => {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isLogin, setIsLogin] = useState(false);
   const [username, setUsername] = useState("");
-  const [showMenu, setShowMenu] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);  
+
+  const updateData = async (endpoint, setState) => {
+    try {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND}${endpoint}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            credentials: 'include',
+        });
+        if (response.ok) {
+            const updatedData = await response.json();
+            setState(updatedData);
+        }
+    } catch (err) {
+        console.error(`Error updating data from ${endpoint}:`, err);
+        setError(err.message);
+    }
+  };
+
+  const startUpdating = () => {
+    const intervalId = setInterval(async () => {
+      await updateData('/api/followers/', (data) => setFollowers(data.followers));
+      await updateData('/api/following/', (data) => setFollowing(data.following));
+    }, 5000);
+    return intervalId;  // 返回 intervalId
+  };
 
   useEffect(() => {
-    // Fetch login state and username
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND}/auth/redirect/`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.is_authenticated) {
-            setIsLogin(true);
-            setUsername(data.username);
-          }
-        }
-      } catch (err) {
-        console.error("Error fetching user data:", err);
-      }
-    };
-
     fetchUserData();
-
-    // Fetch followers and following
-    const fetchData = async () => {
-      try {
-        const followersResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/followers/`, {
-          credentials: "include",
-        });
-        if (!followersResponse.ok) throw new Error("Failed to fetch followers");
-        const followersData = await followersResponse.json();
-        setFollowers(followersData.followers);
-
-        const followingResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/following/`, {
-          credentials: "include",
-        });
-        if (!followingResponse.ok) throw new Error("Failed to fetch following");
-        const followingData = await followingResponse.json();
-        setFollowing(followingData.following);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
+    const intervalId = startUpdating();  // 获取 intervalId
+    return () => clearInterval(intervalId);  // 清除 intervalId
   }, []);
+
+  // Fetch login state and username
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND}/auth/redirect/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.is_authenticated) {
+          setIsLogin(true);
+          setUsername(data.username);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+    }
+  };
 
   const handleLogout = () => {
     fetch(`${process.env.REACT_APP_BACKEND}/api/logout/`, {
@@ -96,53 +100,116 @@ const Friends = () => {
     setShowMenu(false);
   };
 
-  const handleWagBack = async (followerId) => {
+  const handleFollowAction = async (action, petId, setState) => {
+    console.log("action", action);
+    const endpoint =
+      action === "follow"
+        ? `/api/wag-back/${petId}/`
+        : `/api/unfollow-pet/${petId}/`;
+  
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/wag-back/${followerId}/`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND}${endpoint}`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           "X-CSRFToken": getCSRFToken(),
         },
-        credentials: "include",
-        body: JSON.stringify({ followerId }),
       });
+  
       if (response.ok) {
-        const updatedFollower = await response.json();
-        setFollowers((prevFollowers) =>
-          prevFollowers.map((follower) =>
-            follower.id === updatedFollower.id ? updatedFollower : follower
-          )
+        const updatedData = await response.json();
+  
+        // update the state
+        setState((prevState) =>
+          action === "follow"
+            ? prevState.map((item) =>
+                item.id === updatedData.id ? updatedData : item
+              )
+            : prevState.filter((item) => item.id !== petId)
         );
+        console.log("updatedData", updatedData);
       }
     } catch (err) {
-      console.error("Error wagging back:", err);
+      console.error(`Error during ${action}:`, err);
     }
+  };  
+  
+  // if (isLoading) return <div className="loading">Loading...</div>;
+  if (error) return <div className="error">{error}</div>;
+
+  const handleFollowing = async (followerId) => {
+    await handleFollowAction("follow", followerId, setFollowers);
+    await updateData('/api/following/', (data) => setFollowing(data.following));
   };
   
   const handleUnfollow = async (followingId) => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/unfollow-pet/${followingId}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": getCSRFToken(),
-        },
-        credentials: "include",
-        body: JSON.stringify({ followingId }),
-      });
-      if (response.ok) {
-        setFollowing((prevFollowing) =>
-          prevFollowing.filter((follow) => follow.id !== followingId)
-        );
-      }
-    } catch (err) {
-      console.error("Error unfollowing:", err);
+    const isConfirmed = window.confirm("Are you sure you want to unfollow this user?");
+    if (isConfirmed) {
+      await handleFollowAction("unfollow", followingId, setFollowing);
+      window.alert("You have unfollowed this user.");
+      await updateData('/api/following/', (data) => setFollowing(data.following));
     }
   };
   
-  if (isLoading) return <div className="loading">Loading...</div>;
-  if (error) return <div className="error">{error}</div>;
+  
+  // friend item component
+  const FriendItem = ({ friend, onWagBack, onUnfollow, isFollower }) => {
+    const { id, name, photo, isFriend } = friend;
+    console.log("friend", friend);
+    console.log("isFollower", isFollower);
+
+    const label = isFriend ? 'Friends' : (isFollower ? 'Wag back' : 'Wagging');
+    const onClick = (isFollower && !isFriend) ? () => onWagBack(friend.id) : () => onUnfollow(friend.id);
+    console.log("onClick", onClick);
+  
+    return (
+      <div className="friend-item" key={id}>
+        <div className="friend-avatar">
+          <img
+            src={photo ? photo : '/image/default.png'}
+            alt={`${name}'s avatar`}
+          />
+        </div>
+        <div className="friend-content">
+          <div className="friend-text">
+            {isFollower ? '' : 'You wag'}
+            <span
+              className="friend-name"
+              onClick={() => window.location.href = `/OtherProfile/${id}`}
+            >
+              {name}
+            </span>
+            {isFollower ? ' wags your tail and says hi' : ` 's tail and say hi`}
+          </div>
+
+          <button
+            className={`wag-back-button ${isFriend || !isFollower ? "wagging" : ""}`}
+            onClick={onClick}
+          >
+            {label}
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // friend list component
+  const FriendList = ({ friends, onWagBack, onUnfollow, isFollower }) => (
+    <div className="friends-list">
+      {friends.map(friend => {
+        return (
+          <FriendItem
+          key={friend.id}
+          friend={friend}
+          onWagBack={onWagBack}
+          onUnfollow={onUnfollow}
+          isFollower={isFollower}
+        />
+        )
+      })}
+    </div>
+  );
 
   return (
     <div className="friends-container">
@@ -174,24 +241,12 @@ const Friends = () => {
           <h2 className="column-title">
             <span className="count">{followers.length}</span> Followers
           </h2>
-          <div className="friends-list">
-            {followers.map((follower) => (
-              <div className="friend-item" key={follower.id}>
-                <div className="friend-avatar"></div>
-                <div className="friend-content">
-                  <div className="friend-text">
-                    {`${follower.name} wags your tail and says hi`}
-                  </div>
-                  <button
-                    className={`wag-back-button ${follower.hasWaggedBack ? "wagging" : ""}`}
-                    onClick={() => handleWagBack(follower.id)}
-                  >
-                    {follower.hasWaggedBack ? "Wagging" : "Wag back"}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <FriendList 
+            friends={followers} 
+            onWagBack={handleFollowing}
+            onUnfollow={handleUnfollow}
+            isFollower={true}
+          />
         </div>
 
         {/* Right Column - Following */}
@@ -199,31 +254,12 @@ const Friends = () => {
           <h2 className="column-title">
             <span className="count">{following.length}</span> Following
           </h2>
-          <div className="friends-list">
-            {following.map((follow) => (
-              <div className="friend-item" key={follow.id}>
-                <div className="friend-avatar"></div>
-                <div className="friend-content">
-                  <div className="friend-text">
-                    {`You wag `}
-                    <span 
-                      className="friend-name"
-                      onClick={() => window.location.href = `/OtherProfile/${follow.id}`}
-                    >
-                      {follow.name}
-                    </span>
-                    {`'s tail and say hi`}
-                  </div>
-                  <button
-                    className="wag-back-button wagging"
-                    onClick={() => handleUnfollow(follow.id)}
-                  >
-                    Unfollow
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <FriendList
+            friends={following}
+            onWagBack={handleFollowing}
+            onUnfollow={handleUnfollow}
+            isFollower={false}
+          />
         </div>
       </div>
     </div>
