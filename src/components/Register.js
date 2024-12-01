@@ -43,7 +43,7 @@ const Register = () => {
                             <div className="WelcomeText">Welcome to Petpal!</div>
                             <div className="register-paw-print">
                                 <div className="register-paw-image">
-                                    <img src={`${process.env.PUBLIC_URL}/image/g3023.svg`} alt="Paw Print" />
+                                    <img src={`${process.env.PUBLIC_URL}/static/image/g3023.svg`} alt="Paw Print" />
                                 </div>
                             </div>
                         </div>

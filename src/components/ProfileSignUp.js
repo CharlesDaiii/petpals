@@ -493,7 +493,7 @@ const ProfileSignUp = () => {
                             <div className="profile-title">Profile Sign Up</div>
                             <div className="profile-paw-print">
                                 <div className="profile-paw-image">
-                                    <img src={`${process.env.PUBLIC_URL}/image/g3023.svg`} alt="Paw Print" />
+                                    <img src={`${process.env.PUBLIC_URL}/static/image/g3023.svg`} alt="Paw Print" />
                                 </div>
                             </div>
                         </div>
@@ -622,7 +622,7 @@ const ProfileSignUp = () => {
                             <div className="profile-title">Adding photos for your pet!</div>
                             <div className="profile-paw-print">
                                 <div className="profile-paw-image">
-                                    <img src={`${process.env.PUBLIC_URL}/image/g3023.svg`} alt="Paw Print" />
+                                    <img src={`${process.env.PUBLIC_URL}/static/image/g3023.svg`} alt="Paw Print" />
                                 </div>
                             </div>
                         </div>
@@ -676,7 +676,7 @@ const ProfileSignUp = () => {
                             <div className="profile-title">Select Your Pet's Character</div>
                             <div className="profile-paw-print">
                                 <div className="profile-paw-image">
-                                    <img src={`${process.env.PUBLIC_URL}/image/g3023.svg`} alt="Paw Print" />
+                                    <img src={`${process.env.PUBLIC_URL}/static/image/g3023.svg`} alt="Paw Print" />
                                 </div>
                             </div>
                         </div>
@@ -714,7 +714,7 @@ const ProfileSignUp = () => {
                             <div className="profile-title">Red Flags</div>
                             <div className="profile-paw-print">
                                 <div className="profile-paw-image">
-                                    <img src={`${process.env.PUBLIC_URL}/image/g3023.svg`} alt="Paw Print" />
+                                    <img src={`${process.env.PUBLIC_URL}/static/image/g3023.svg`} alt="Paw Print" />
                                 </div>
                             </div>
                         </div>
