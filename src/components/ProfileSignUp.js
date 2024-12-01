@@ -285,9 +285,10 @@ const ProfileSignUp = () => {
         try {
             const csrfToken = getCSRFToken();
             const from = new URLSearchParams(window.location.search).get('from');
-            
+            const isEditing = from === 'MyProfile';
+
             const response = await fetch(
-                from === 'MyProfile' 
+                isEditing
                     ? `${process.env.REACT_APP_BACKEND}/api/update-pet/`
                     : `${process.env.REACT_APP_BACKEND}/api/ProfileSignUp/`,
                 {
@@ -312,10 +313,10 @@ const ProfileSignUp = () => {
                 throw new Error(data.error || "Failed to update profile");
             }
 
-            alert(from === 'MyProfile' 
+            alert(isEditing
                 ? "Pet profile updated successfully!"
                 : "Pet profile created successfully!");
-            window.location.href = '/MyProfile';
+            window.location.href = isEditing ? '/MyProfile' : '/Matching';
         } catch (error) {
             console.error("Fetch error:", error);
             if (error.message === "Server returned non-JSON response") {
