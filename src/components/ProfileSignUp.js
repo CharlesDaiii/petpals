@@ -116,7 +116,7 @@ const ProfileSignUp = () => {
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         
-        // 处理不同字段的输入限制
+        // deal with different input limits
         let finalValue = value;
         let error = '';
 
@@ -202,7 +202,7 @@ const ProfileSignUp = () => {
         };
     
         console.log("Checking pet existence...");
-        checkPetExists(); // 调用检查函数
+        checkPetExists(); // use the check function
     }, [navigate]);
     
     
@@ -216,7 +216,7 @@ const ProfileSignUp = () => {
         });
     };
 
-    // 上传照片事件处函数
+    // upload photo event handler function
     const handlePhotoUpload = async (event) => {
         const files = event.target.files;
         const formData = new FormData();
@@ -233,13 +233,13 @@ const ProfileSignUp = () => {
                     "X-CSRFToken": csrfToken,
                 },
                 credentials: 'include',
-                body: formData, // 上传文件
+                body: formData, // upload files
             });
     
             if (response.ok) {
                 const data = await response.json();
                 console.log("Uploaded photo URLs:", data.photos);
-                setPhotos(data.photos); // 更新照片 URL
+                setPhotos(data.photos); // update photo URLs
             } else {
                 console.error("Failed to upload photos.");
             }
@@ -329,9 +329,9 @@ const ProfileSignUp = () => {
     
     
 
-    // 切换页面
+    // switch page
     const handleNext = () => {
-        // 在第一页时进行表单验证
+        // validate form on the first page
         if (currentPage === 1) {
             const requiredFields = ['name', 'birth_date', 'breed', 'sex', 'weight', 'location'];
             const hasEmptyFields = requiredFields.some(field => !formData[field]);
