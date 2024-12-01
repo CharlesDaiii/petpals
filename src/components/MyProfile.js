@@ -140,6 +140,25 @@ const MyProfile = () => {
     photos,
   } = petData;
 
+  const InfoItem = ({ label, value }) => {
+    const formatValue = (value) => {
+      if (Array.isArray(value)) {
+        return value.join(', ');
+      }
+      if (typeof value === 'string') {
+        return value.split(',').map((item) => item.trim()).join(', ');
+      }
+      return value || 'N/A';
+    };
+
+    return (
+      <div className="info-item">
+        <span className="label-text">{label}:</span>
+        <span className="info-value">{formatValue(value)}</span>
+      </div>
+    )
+  };
+
   return (
     <div className="profile">
       <header className="AppHeader">
@@ -177,59 +196,36 @@ const MyProfile = () => {
       </div>
 
       <div className="group">
-        <p className="kiwi-sex-man-breed">
-          <span className="span">{name}</span>
-          <div className="info-grid">
-            <div className="info-item">
-              <span className="label-text">Sex:</span>
-              <span className="info-value">{sex}</span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Breed:</span>
-              <span className="info-value">{breed}</span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Dog-walking time:</span>
-              <span className="info-value">{preferred_time}</span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Age:</span>
-              <span className="info-value">{new Date().getFullYear() - new Date(birth_date).getFullYear()} years old</span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Weight:</span>
-              <span className="info-value">{weight} lbs</span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Location:</span>
-              <span className="info-value">{location}</span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Health states:</span>
-              <span className="info-value">{health_states}</span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Character:</span>
-              <span className="info-value">
-                {Array.isArray(characters) 
-                  ? characters.join(', ')
-                  : typeof characters === 'string' 
-                    ? characters.split(',').join(', ') 
-                    : characters}
-              </span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Red flags:</span>
-              <span className="info-value">
-                {Array.isArray(red_flags)
-                  ? red_flags.join(', ')
-                  : typeof red_flags === 'string'
-                    ? red_flags.split(',').join(', ')
-                    : red_flags}
-              </span>
-            </div>
+        <span className="span">{name}</span>
+        <div className="info-grid">
+          <div className="info-item">
+            <span className="label-text">Sex:</span>
+            <span className="info-value">{sex}</span>
           </div>
-        </p>
+          <div className="info-item">
+            <span className="label-text">Breed:</span>
+            <span className="info-value">{breed}</span>
+          </div>
+          <div className="info-item">
+            <span className="label-text">Dog-walking Time:</span>
+            <span className="info-value">{preferred_time}</span>
+          </div>
+          <div className="info-item">
+            <span className="label-text">Age:</span>
+            <span className="info-value">{new Date().getFullYear() - new Date(birth_date).getFullYear()} years old</span>
+          </div>
+          <div className="info-item">
+            <span className="label-text">Weight:</span>
+            <span className="info-value">{weight} lbs</span>
+          </div>
+          <div className="info-item">
+            <span className="label-text">Location:</span>
+            <span className="info-value">{location}</span>
+          </div>
+          <InfoItem label="Health States" value={health_states} />
+          <InfoItem label="Character" value={characters} />
+          <InfoItem label="Red Flags" value={red_flags} />
+        </div>
       </div>
       <div className="shots-followers">
         <button 
