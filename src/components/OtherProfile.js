@@ -1,14 +1,51 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "../styles/OtherProfile.css";
+import { useNavigate } from "react-router-dom";
+import Loading from './Loading';
 
 const OtherProfile = () => {
   const { id } = useParams();
   const [petData, setPetData] = useState(null);
   const [error, setError] = useState(null);
-  const [followers, setFollowers] = useState([]);
-  const [following, setFollowing] = useState([]);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
   const [isLogin, setIsLogin] = useState(false);
+  const [username, setUsername] = useState("");
+  const [showMenu, setShowMenu] = useState(false);
+
+  const handleMouseEnter = () => setShowMenu(true);
+  const handleMouseLeave = () => setShowMenu(false);
+
+  const navigate = useNavigate();
+
+  const navigateTo = (path) => {
+    console.log("path", path);
+    if (path === "Homepage") {
+      navigate(`/`);
+    } else {
+      navigate(`${path}`);
+    }
+    setShowMenu(false);
+  };
+
+  const handleLogout = () => {
+    fetch(`${process.env.REACT_APP_BACKEND}/api/logout/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCSRFToken(),
+      },
+      credentials: "include",
+    })
+      .then((response) => {
+        if (response.ok) {
+          setIsLogin(false);
+          setUsername("");
+        }
+      })
+      .catch((err) => console.error("Logout error:", err));
+  };
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -24,6 +61,9 @@ const OtherProfile = () => {
         if (response.ok) {
           const data = await response.json();
           setIsLogin(data.is_authenticated);
+          if (data.is_authenticated) {
+            setUsername(data.username);
+          }
         }
       } catch (err) {
         console.error("Error checking login status:", err);
@@ -36,27 +76,17 @@ const OtherProfile = () => {
   useEffect(() => {
     const fetchPetData = async () => {
       try {
+        console.log("Fetching pet data for id:", id);
         const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/user-pet/${id}`, {
           method: "GET",
           credentials: "include",
         });
         
         if (response.ok) {
-          const contentType = response.headers.get("content-type");
-          if (contentType && contentType.includes("application/json")) {
-            const data = await response.json();
-            setPetData(data);
-          } else {
-            throw new Error("Invalid response format from server");
-          }
+          const data = await response.json();
+          setPetData(data);
         } else {
-          const text = await response.text();
-          try {
-            const errorData = JSON.parse(text);
-            throw new Error(errorData.error || `Failed to fetch pet data: ${response.status}`);
-          } catch (e) {
-            throw new Error(`Server error: ${response.status}`);
-          }
+          throw new Error(`Failed to fetch pet data: ${response.status}`);
         }
       } catch (err) {
         console.error("Error details:", err);
@@ -66,20 +96,22 @@ const OtherProfile = () => {
 
     const fetchFriendsData = async () => {
       try {
-        const followersResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/followers/${id}`, {
+        const followersResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/followers/?id=${id}`, {
           credentials: "include",
         });
         if (followersResponse.ok) {
-          const followersData = await followersResponse.json();
-          setFollowers(followersData.followers || []);
+          const data = await followersResponse.json();
+          console.log("followersResponse", data);
+          setFollowersCount(data.followers_count || 0);
         }
 
-        const followingResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/following/${id}`, {
+        const followingResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/following/?id=${id}`, {
           credentials: "include",
         });
         if (followingResponse.ok) {
-          const followingData = await followingResponse.json();
-          setFollowing(followingData.following || []);
+          const data = await followingResponse.json();
+          console.log("followingResponse", data);
+          setFollowingCount(data.following_count || 0);
         }
       } catch (err) {
         console.error("Error fetching friends data:", err);
@@ -91,7 +123,7 @@ const OtherProfile = () => {
   }, [id]);
 
   if (error) return <div className="error">{error}</div>;
-  if (!petData) return <div className="loading">Loading...</div>;
+  if (!petData) return <div><Loading /></div>;
 
   const {
     name = 'null',
@@ -107,9 +139,46 @@ const OtherProfile = () => {
     photos = []
   } = petData;
 
+  const InfoItem = ({ label, value }) => {
+    const formatValue = (value) => {
+      if (Array.isArray(value)) {
+        return value.join(', ');
+      }
+      if (typeof value === 'string') {
+        return value.split(',').map((item) => item.trim()).join(', ');
+      }
+      return value || 'N/A';
+    };
+
+    return (
+      <div className="info-item">
+        <span className="label-text">{label}:</span>
+        <span className="info-value">{formatValue(value)}</span>
+      </div>
+    )
+  };
+
   return (
     <div className="my-profile-container">
-      <div className="text-wrapper-6">{name}'s Profile</div>
+      <header className="other-profile-header">
+        <div
+          className="header-button username"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          {username}
+          {showMenu && (
+            <div className="dropdown-menu">
+              <button onClick={() => navigateTo("Homepage")}>Homepage</button>
+              <button onClick={() => navigateTo("/Friends")}>Friends</button>
+              <button onClick={() => navigateTo("/Matching")}>Matching</button>
+            </div>
+          )}
+        </div>
+        <button className="header-button" onClick={handleLogout}>
+          {isLogin ? "Logout" : "Login"}
+        </button>
+      </header>
       
       <div className="photo-placeholder">
         {photos && photos.length > 0 && photos[0] ? (
@@ -124,59 +193,48 @@ const OtherProfile = () => {
       </div>
 
       <div className="group">
-        <p className="kiwi-sex-man-breed">
-          <span className="span">{name}</span>
-          <div className="info-grid">
-            <div className="info-item">
-              <span className="label-text">Sex:</span>
-              <span className="info-value">{sex}</span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Breed:</span>
-              <span className="info-value">{breed}</span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Dog-walking time:</span>
-              <span className="info-value">{preferred_time}</span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Age:</span>
-              <span className="info-value">
-                {new Date().getFullYear() - new Date(birth_date).getFullYear()} years old
-              </span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Weight:</span>
-              <span className="info-value">{weight} lbs</span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Location:</span>
-              <span className="info-value">{location}</span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Health states:</span>
-              <span className="info-value">{health_states}</span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Character:</span>
-              <span className="info-value">{characters}</span>
-            </div>
-            <div className="info-item">
-              <span className="label-text">Red flags:</span>
-              <span className="info-value">{red_flags}</span>
-            </div>
+        <span className="span">{name}</span>
+        <div className="info-grid">
+          <div className="info-item">
+            <span className="label-text">Sex:</span>
+            <span className="info-value">{sex}</span>
           </div>
-        </p>
+          <div className="info-item">
+            <span className="label-text">Breed:</span>
+            <span className="info-value">{breed}</span>
+          </div>
+          <div className="info-item">
+            <span className="label-text">Dog-walking time:</span>
+            <span className="info-value">{preferred_time}</span>
+          </div>
+          <div className="info-item">
+            <span className="label-text">Age:</span>
+            <span className="info-value">
+              {new Date().getFullYear() - new Date(birth_date).getFullYear()} years old
+            </span>
+          </div>
+          <div className="info-item">
+            <span className="label-text">Weight:</span>
+            <span className="info-value">{weight} lbs</span>
+          </div>
+          <div className="info-item">
+            <span className="label-text">Location:</span>
+            <span className="info-value">{location}</span>
+          </div>
+          <InfoItem label="Health States" value={health_states} />
+          <InfoItem label="Character" value={characters} />
+          <InfoItem label="Red Flags" value={red_flags} />
+        </div>
       </div>
 
-      <div className="social-stats">
-        <div className="followers">
-          <div className="count">{followers?.length || 0}</div>
+      <div className="shots-followers">
+        <div className="followers-section">
+          <div className="count">{followersCount}</div>
           <div className="label">Followers</div>
         </div>
         <div className="divider"></div>
-        <div className="following">
-          <div className="count">{following?.length || 0}</div>
+        <div className="following-section">
+          <div className="count">{followingCount}</div>
           <div className="label">Following</div>
         </div>
       </div>
