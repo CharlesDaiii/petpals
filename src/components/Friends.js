@@ -175,7 +175,7 @@ const Friends = () => {
         </div>
         <div className="friend-content">
           <div className="friend-text">
-            {isFollower ? '' : 'You wag'}
+            {isFollower ? '' : 'You wag '}
             <span
               className="friend-name"
               onClick={() => window.location.href = `/OtherProfile/${id}`}
