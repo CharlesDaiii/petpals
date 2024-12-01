@@ -182,14 +182,14 @@
     }
 }
 
-/* 添加加载状态样式 */
+/* add loading status style */
 .loading {
     text-align: center;
     padding: 2rem;
     color: #666;
 }
 
-/* 添加错误状态样式 */
+/* add error status style */
 .error {
     color: #ec847c;
     text-align: center;
