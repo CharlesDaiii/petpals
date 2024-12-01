@@ -95,7 +95,7 @@ function HomePage() {
 
       {/* 其余内容 */}
       <div className="home-header-section">
-        <img className="HeaderImage" src={`${process.env.PUBLIC_URL}/image/header.jpg`} alt="Header" />
+        <img className="HeaderImage" src={`${process.env.PUBLIC_URL}/static/image/header.jpg`} alt="Header" />
         <div className="home-intro-text">
           <div className="home-tagline">
             <span className="home-text-black">Connect. </span>
@@ -110,22 +110,22 @@ function HomePage() {
         <div className="home-promise-text">Petpal Promise</div>
         <div className="home-paw-print">
           <div className="home-paw-image">
-            <img src={`${process.env.PUBLIC_URL}/image/g3023.svg`} alt="Paw Print" />
+            <img src={`${process.env.PUBLIC_URL}/static/image/g3023.svg`} alt="Paw Print" />
           </div>
         </div>
       </div>
 
       <div className="FeaturesSection">
         <div className="FeatureCard">
-          <img className="FeatureImage" src={`${process.env.PUBLIC_URL}/image/1.svg`} alt="Owner Profile" />
+          <img className="FeatureImage" src={`${process.env.PUBLIC_URL}/static/image/1.svg`} alt="Owner Profile" />
           <div className="FeatureTitle">SET YOUR PROFILE</div>
         </div>
         <div className="FeatureCard">
-          <img className="FeatureImage" src={`${process.env.PUBLIC_URL}/image/2.svg`} alt="Pet Shop" />
+          <img className="FeatureImage" src={`${process.env.PUBLIC_URL}/static/image/2.svg`} alt="Pet Shop" />
           <div className="FeatureTitle">MATCH AND CHAT</div>
         </div>
         <div className="FeatureCard">
-          <img className="FeatureImage" src={`${process.env.PUBLIC_URL}/image/3.svg`} alt="Pets Allowed" />
+          <img className="FeatureImage" src={`${process.env.PUBLIC_URL}/static/image/3.svg`} alt="Pets Allowed" />
           <div className="FeatureTitle">FIND PLACE TO WALKING</div>
         </div>
       </div>
