@@ -224,12 +224,22 @@ def get_user_pet(request):
     try:
         user = request.user
         pet = Pet.objects.filter(owner=user).first()
-
         if not pet:
             return Response({"error": "No pet found for the current user."}, status=404)
-
         pet_data = pet.get_data()
 
+        return Response(pet_data, status=200)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_other_pet(request, id):
+    try:
+        pet = Pet.objects.filter(id=id).first()
+        if not pet:
+            return Response({"error": "Pet not found."}, status=404)
+        pet_data = pet.get_data()
         return Response(pet_data, status=200)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
@@ -265,11 +275,20 @@ def follow_pet(request, pet_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_following(request):
+    pet_id = request.query_params.get('id', None)
     try:
         user_pet = Pet.objects.get(owner=request.user)
+
+        # get other pet's following count
+        if pet_id and pet_id != str(user_pet.id):
+            user_pet = Pet.objects.get(id=pet_id)
+            following_count = user_pet.following.count()
+            return Response({'following_count': following_count}, status=200)
+
+        # get current user's following
         following_pets = user_pet.following.all()
         following_data = []
-        
+
         for followed_pet in following_pets:
             try:
                 followed_pet = Pet.objects.get(id=followed_pet.id)
@@ -286,48 +305,22 @@ def get_following(request):
     except Pet.DoesNotExist:
         return Response({'error': 'Pet not found'}, status=404)
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def unfollow_pet(request, pet_id):
-    print(f"Received unfollow request for pet {pet_id}")
-    print(f"User authenticated: {request.user.is_authenticated}")
-    print(f"User: {request.user.username}")
-    
-    try:        
-        user_pet = Pet.objects.get(owner=request.user)
-        print(f"Found user's pet: {user_pet.name}")
-        
-        user_pet.unwag(pet_id)
-
-        # # Remove WagHistory record
-        # deleted_count, _ = WagHistory.objects.filter(
-        #     wagger=request.user,
-        #     wagged_to=pet_to_unfollow.owner
-        # ).delete()
-        # print(f"Deleted {deleted_count} WagHistory record(s)")
-        
-        return Response({
-            'message': 'Successfully unfollowed pet',
-            'isFollowing': False
-        }, status=200)
-        
-    except Pet.DoesNotExist as e:
-        print(f"Pet not found error: {str(e)}")
-        return Response({'error': 'Pet not found'}, status=404)
-    except ValueError as e:
-        print(f"Error in unwag method: {str(e)}")
-        return Response({'error': str(e)}, status=404)
-    except Exception as e:
-        print(f"Unexpected error: {str(e)}")
-        return Response({'error': str(e)}, status=400)
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_followers(request):
+    pet_id = request.query_params.get('id', None)
+    print(f"Received get followers request for pet {pet_id}")
     try:
         user_pet = Pet.objects.get(owner=request.user)
-        followers_data = []
+
+        # get other pet's followers count
+        if pet_id and pet_id != str(user_pet.id):
+            user_pet = Pet.objects.get(id=pet_id)
+            followers_count = user_pet.followers.count()
+            return Response({'followers_count': followers_count}, status=200)
         
+        # get current user's followers
+        followers_data = []
         for follower_pet in user_pet.followers.all():
             try:
                 followers_data.append({
@@ -347,14 +340,37 @@ def get_followers(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+def unfollow_pet(request, pet_id):
+    print(f"Received unfollow request for pet {pet_id}")
+    print(f"User authenticated: {request.user.is_authenticated}")
+    print(f"User: {request.user.username}")
+    
+    try:        
+        user_pet = Pet.objects.get(owner=request.user)
+        print(f"Found user's pet: {user_pet.name}")
+        
+        user_pet.unwag(pet_id)
+        
+        return Response({
+            'message': 'Successfully unfollowed pet',
+            'isFollowing': False
+        }, status=200)
+        
+    except Pet.DoesNotExist as e:
+        print(f"Pet not found error: {str(e)}")
+        return Response({'error': 'Pet not found'}, status=404)
+    except ValueError as e:
+        print(f"Error in unwag method: {str(e)}")
+        return Response({'error': str(e)}, status=404)
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+        return Response({'error': str(e)}, status=400)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def wag_back(request, follower_id):
     try:
         user_pet = Pet.objects.get(owner=request.user)
-        
-        # WagHistory.objects.create(
-        #     wagger=request.user,
-        #     wagged_to=follower_pet.owner
-        # )
         
         user_pet.wag(follower_id)
         
