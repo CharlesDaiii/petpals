@@ -13,17 +13,17 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from configparser import ConfigParser
 import os
+from django.conf.urls.static import static
 
 # ========== Paths ========== #
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-DEFAULT_PHOTO_URL = 'https://my-bucket.s3.amazonaws.com/default.jpg'
-
 # switch to 'http://localhost:3000' for development
-FRONTEND_URL = "http://team20.cmu-webapps.com"
-BACKEND_URL = "localhost:8000"
+# FRONTEND_URL = "http://team20.cmu-webapps.com"
+FRONTEND_URL = "http://localhost:3000"
+BACKEND_URL = "http://localhost:8000"
 
 # ========== Configuration ========== #
 CONFIG = ConfigParser()
@@ -111,8 +111,11 @@ USE_I18N = True
 USE_TZ = True
 
 # ========== Static and Media Files ========== #
-STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, STATIC_URL)
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "static"
+
+# DEFAULT_PHOTO_URL = 'https://my-bucket.s3.amazonaws.com/default.jpg'
+DEFAULT_PHOTO_URL = f"{STATIC_URL}image/default.png"
 
 # ========== Default Primary Key ========== #
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -138,7 +141,7 @@ except:
 
 # ========== Login/Redirect Configuration ========== #
 LOGIN_URL = f"{FRONTEND_URL}/Register"
-SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = F"{BACKEND_URL}/auth/complete/google-oauth2/"
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = f"{BACKEND_URL}/auth/complete/google-oauth2/"
 LOGIN_REDIRECT_URL = FRONTEND_URL
 
 # ========== Allowed Path Suffixes ========== #
