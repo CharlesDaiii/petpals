@@ -200,8 +200,6 @@ const ProfileSignUp = () => {
                 setIsLoading(false);
             }
         };
-    
-        console.log("Checking pet existence...");
         checkPetExists(); // use the check function
     }, [navigate]);
     
@@ -238,7 +236,6 @@ const ProfileSignUp = () => {
     
             if (response.ok) {
                 const data = await response.json();
-                console.log("Uploaded photo URLs:", data.photos);
                 setPhotos(data.photos); // update photo URLs
             } else {
                 console.error("Failed to upload photos.");
@@ -353,10 +350,8 @@ const ProfileSignUp = () => {
     const handlePrevious = () => setCurrentPage((prevPage) => prevPage - 1);
 
     useEffect(() => {
-        console.log('Loading Google Maps API...');
         loadGoogleMapsAPI()
             .then(() => {
-                console.log('Google Maps API loaded successfully');
                 setGoogleAPILoaded(true);
             })
             .catch(error => {
@@ -365,27 +360,22 @@ const ProfileSignUp = () => {
     }, []);
 
     useEffect(() => {
-        console.log('googleAPILoaded changed:', googleAPILoaded);
         if (googleAPILoaded) {
             initializeAutocomplete();
         }
     
         return () => {
             if (autocomplete) {
-                console.log('Cleaning up autocomplete listeners');
                 window.google?.maps?.event?.clearInstanceListeners(autocomplete);
             }
         };
     }, [googleAPILoaded]);
 
     const initializeAutocomplete = async () => {
-        console.log('Initializing autocomplete...');
         try {
             const maps = await loadGoogleMapsAPI();
-            console.log('Maps object received:', !!maps);
             
             if (locationInputRef.current && !autocomplete) {
-                console.log('Creating new autocomplete instance');
                 const newAutocomplete = new maps.places.Autocomplete(locationInputRef.current, {
                     types: ['address'],
                     fields: [
@@ -398,9 +388,7 @@ const ProfileSignUp = () => {
                 });
 
                 newAutocomplete.addListener('place_changed', () => {
-                    console.log('Place selected');
                     const place = newAutocomplete.getPlace();
-                    console.log('Selected place:', place);
                     if (place.formatted_address) {
                         setFormData(prevData => ({
                             ...prevData,
@@ -410,7 +398,6 @@ const ProfileSignUp = () => {
                 });
 
                 setAutocomplete(newAutocomplete);
-                console.log('Autocomplete initialized successfully');
             } else {
                 console.log('Skipping autocomplete initialization:', {
                     hasInput: !!locationInputRef.current,
@@ -470,11 +457,9 @@ const ProfileSignUp = () => {
 
     if (!shouldRender) return null;
     if (isLoading) {
-        console.log("Page is loading...");
         return <div>Loading...</div>;
     }
     if (!shouldRender) {
-        console.log("User already has a pet, redirecting...");
         return null;
     }
     

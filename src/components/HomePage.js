@@ -21,7 +21,6 @@ function HomePage() {
 
         if (response.ok) {
           const data = await response.json(); // Parse the JSON response
-          console.log("Fetched data:", data);
           if (data && data.is_authenticated) {
             setIsLogin(true);
             setUsername(data.username);

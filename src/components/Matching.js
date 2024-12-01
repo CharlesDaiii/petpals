@@ -56,9 +56,7 @@ export const Matching = () => {
     };
 
     const fetchData = async () => {
-        console.log("Fetching data...");
         if (isFetchingRef.current || fetchCount >= maxFetchAttempts) {
-            console.log(`Fetching data... ${isFetchingRef.current ? 'fetching' : fetchCount}`);
             return;
         }
 
@@ -115,7 +113,6 @@ export const Matching = () => {
         const sortedProfiles = [...profiles].sort((a, b) => a.distance - b.distance);
         setProfiles(sortedProfiles);
         setCurrentIndex(0);
-        console.log('Sorted by distance', sortedProfiles);
     };
 
     const handleSortByMatch = () => {
@@ -187,7 +184,6 @@ export const Matching = () => {
                 return profile;
             });
             setProfiles(updatedProfiles);
-            console.log(`Successfully ${isFollowing ? 'unfollowed' : 'followed'} pet`, profileId);
         } catch (error) {
             console.error('Error:', error);
             alert(`Unable to ${isFollowing ? 'unfollow' : 'follow'} pet: ${error.message}. Please try again or contact support if the issue persists.`);

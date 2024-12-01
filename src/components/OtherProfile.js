@@ -76,7 +76,6 @@ const OtherProfile = () => {
   useEffect(() => {
     const fetchPetData = async () => {
       try {
-        console.log("Fetching pet data for id:", id);
         const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/user-pet/${id}`, {
           method: "GET",
           credentials: "include",
@@ -101,7 +100,6 @@ const OtherProfile = () => {
         });
         if (followersResponse.ok) {
           const data = await followersResponse.json();
-          console.log("followersResponse", data);
           setFollowersCount(data.followers_count || 0);
         }
 
@@ -110,7 +108,6 @@ const OtherProfile = () => {
         });
         if (followingResponse.ok) {
           const data = await followingResponse.json();
-          console.log("followingResponse", data);
           setFollowingCount(data.following_count || 0);
         }
       } catch (err) {

@@ -103,7 +103,6 @@ const Friends = () => {
   };
 
   const handleFollowAction = async (action, petId, setState) => {
-    console.log("action", action);
     const endpoint =
       action === "follow"
         ? `/api/wag-back/${petId}/`
@@ -130,7 +129,6 @@ const Friends = () => {
               )
             : prevState.filter((item) => item.id !== petId)
         );
-        console.log("updatedData", updatedData);
       }
     } catch (err) {
       console.error(`Error during ${action}:`, err);
@@ -158,12 +156,9 @@ const Friends = () => {
   // friend item component
   const FriendItem = ({ friend, onWagBack, onUnfollow, isFollower }) => {
     const { id, name, photo, isFriend } = friend;
-    console.log("friend", friend);
-    console.log("isFollower", isFollower);
 
     const label = isFriend ? 'Friends' : (isFollower ? 'Wag back' : 'Wagging');
     const onClick = (isFollower && !isFriend) ? () => onWagBack(friend.id) : () => onUnfollow(friend.id);
-    console.log("onClick", onClick);
   
     return (
       <div className="friend-item" key={id}>

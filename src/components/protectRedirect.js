@@ -1,8 +1,5 @@
 const protectRedirect = (curPage, nextPage, params = {}) => {
-    console.log("Current Page:", curPage);
-    console.log("Next Page:", nextPage);
     let backendRedirectUrl = `${process.env.REACT_APP_BACKEND}/auth/redirect/?next=${nextPage}`;
-    console.log(backendRedirectUrl);
 
     if (Object.keys(params).length > 0) {
         const queryParams = new URLSearchParams(params).toString();
