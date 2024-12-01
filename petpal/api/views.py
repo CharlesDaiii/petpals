@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Pet, UserProfile, WagHistory
+from .models import Pet, UserProfile
 from .forms import PetForm, RegisterForm
 from .serializers import PetSerializer
 from .filters import process_target_pet
@@ -23,7 +23,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import Pet, UserProfile, WagHistory
+from .models import Pet, UserProfile
 
 # --- authentication methods ---
 # Custom login required decorator, return json response
@@ -117,39 +117,13 @@ class PetFormView(View):
 def profile_setup(request):
     try:
         pet_data = request.data
-        # 检查health_states, characters, red_flags是否为列表
-        if not isinstance(pet_data.get('health_states'), list):
-            return Response({'error': 'Health states must be a list.'}, status=400)
-        if not isinstance(pet_data.get('characters'), list):
-            return Response({'error': 'Characters must be a list.'}, status=400)
-        if not isinstance(pet_data.get('red_flags'), list):
-            return Response({'error': 'Red flags must be a list.'}, status=400)
-        
-        pet = Pet.objects.create(
-            owner=request.user,
-            name=pet_data['name'],
-            sex=pet_data['sex'],
-            preferred_time=pet_data['preferred_time'],
-            breed=pet_data['breed'],
-            birth_date=pet_data['birth_date'],
-            location=pet_data['location'],
-            weight=float(pet_data['weight']),
-            health_states=pet_data['health_states'],
-            characters=pet_data['characters'],
-            red_flags=pet_data['red_flags'],
-            photos=pet_data.get('photos', []),
-        )
-
-        user_profile, created = UserProfile.objects.get_or_create(user=request.user)
-        user_profile.pet = pet
-        user_profile.save()
+        pet = Pet.create_pet(user=request.user, pet_data=pet_data)
 
         return Response({'message': 'Profile created successfully'}, status=201)
+    except ValueError as e:
+        return Response({'error': str(e)}, status=400)
     except Exception as e:
         return Response({'error': str(e)}, status=400)
-
-        
-
 
 # helper function to check path suffix:
 def validate_url(next_url):
@@ -170,20 +144,8 @@ def match_pet(request):
         user_data = {
             'username': request.user.username,
         }
-        pet_data = {
-            'id': user_pet.id,
-            'name': user_pet.name,
-            'breed': user_pet.breed,
-            'sex': user_pet.sex,
-            'birth_date': user_pet.birth_date,
-            'weight': user_pet.weight,
-            'location': user_pet.location,
-            'preferred_time': user_pet.preferred_time,
-            'health_states': user_pet.health_states,
-            'characters': user_pet.characters,
-            'red_flags': user_pet.red_flags,
-            'photos': user_pet.photos,
-        }
+        pet_data = user_pet.get_data(as_list=False)
+
         return Response({
             'user': user_data,
             'pet': pet_data
@@ -201,19 +163,7 @@ def get_user_pet(request):
     try:
         user_profile = UserProfile.objects.get(user=request.user)
         if user_profile.pet:
-            return Response({
-                'name': user_profile.pet.name,
-                'breed': user_profile.pet.breed,
-                'sex': user_profile.pet.sex,
-                'birth_date': user_profile.pet.birth_date,
-                'weight': user_profile.pet.weight,
-                'location': user_profile.pet.location,
-                'preferred_time': user_profile.pet.preferred_time,
-                'health_states': user_profile.pet.health_states,
-                'characters': user_profile.pet.characters,
-                'red_flags': user_profile.pet.red_flags,
-                'photos': user_profile.pet.photos,
-            })
+            return Response(user_profile.pet.get_data(), status=200)
 
         return Response({'error': 'No pet found'}, status=404)
     except UserProfile.DoesNotExist:
@@ -278,19 +228,7 @@ def get_user_pet(request):
         if not pet:
             return Response({"error": "No pet found for the current user."}, status=404)
 
-        pet_data = {
-            "name": pet.name,
-            "sex": pet.sex,
-            "preferred_time": pet.preferred_time,
-            "breed": pet.breed,
-            "birth_date": pet.birth_date,
-            "location": pet.location,
-            "weight": pet.weight,
-            "health_states": pet.health_states if isinstance(pet.health_states, list) else pet.health_states.split(','),
-            "characters": pet.characters if isinstance(pet.characters, list) else pet.characters.split(','),
-            "red_flags": pet.red_flags if isinstance(pet.red_flags, list) else pet.red_flags.split(','),
-            "photos": pet.photos,
-        }
+        pet_data = pet.get_data()
 
         return Response(pet_data, status=200)
     except Exception as e:
@@ -304,19 +242,10 @@ def follow_pet(request, pet_id):
     print(f"User: {request.user.username}")
     
     try:
-        pet_to_follow = Pet.objects.get(id=pet_id)
-        print(f"Found pet to follow: {pet_to_follow.name}")
-        
         user_pet = Pet.objects.get(owner=request.user)
         print(f"Found user's pet: {user_pet.name}")
         
-        if request.user in pet_to_follow.followers.all():
-            print("User already following this pet")
-            return Response({'message': 'Already following this pet'}, status=200)
-            
-        pet_to_follow.followers.add(request.user)
-        user_pet.following.add(pet_to_follow.owner)
-        print("Successfully added follower relationship")
+        user_pet.wag(pet_id)
         
         return Response({
             'message': 'Successfully followed pet',
@@ -326,6 +255,9 @@ def follow_pet(request, pet_id):
     except Pet.DoesNotExist as e:
         print(f"Pet not found error: {str(e)}")
         return Response({'error': 'Pet not found'}, status=404)
+    except ValueError as e:
+        print(f"Value error: {str(e)}")
+        return Response({'error': str(e)}, status=404)
     except Exception as e:
         print(f"Unexpected error: {str(e)}")
         return Response({'error': str(e)}, status=400)
@@ -335,16 +267,17 @@ def follow_pet(request, pet_id):
 def get_following(request):
     try:
         user_pet = Pet.objects.get(owner=request.user)
-        following_users = user_pet.following.all()
+        following_pets = user_pet.following.all()
         following_data = []
         
-        for followed_user in following_users:
+        for followed_pet in following_pets:
             try:
-                followed_pet = Pet.objects.get(owner=followed_user)
+                followed_pet = Pet.objects.get(id=followed_pet.id)
                 following_data.append({
                     'id': followed_pet.id,
                     'name': followed_pet.name,
-                    'photo': followed_pet.photos[0] if followed_pet.photos else None
+                    'photo': followed_pet.photos[0] if followed_pet.photos else None,
+                    'isFriend': user_pet.is_friend(followed_pet.id),
                 })
             except Pet.DoesNotExist:
                 continue
@@ -360,20 +293,18 @@ def unfollow_pet(request, pet_id):
     print(f"User authenticated: {request.user.is_authenticated}")
     print(f"User: {request.user.username}")
     
-    try:
-        pet_to_unfollow = Pet.objects.get(id=pet_id)
-        print(f"Found pet to unfollow: {pet_to_unfollow.name}")
-        
+    try:        
         user_pet = Pet.objects.get(owner=request.user)
         print(f"Found user's pet: {user_pet.name}")
         
-        if request.user not in pet_to_unfollow.followers.all():
-            print("User is not following this pet")
-            return Response({'message': 'Not following this pet'}, status=200)
-            
-        pet_to_unfollow.followers.remove(request.user)
-        user_pet.following.remove(pet_to_unfollow.owner)
-        print("Successfully removed follower relationship")
+        user_pet.unwag(pet_id)
+
+        # # Remove WagHistory record
+        # deleted_count, _ = WagHistory.objects.filter(
+        #     wagger=request.user,
+        #     wagged_to=pet_to_unfollow.owner
+        # ).delete()
+        # print(f"Deleted {deleted_count} WagHistory record(s)")
         
         return Response({
             'message': 'Successfully unfollowed pet',
@@ -383,6 +314,9 @@ def unfollow_pet(request, pet_id):
     except Pet.DoesNotExist as e:
         print(f"Pet not found error: {str(e)}")
         return Response({'error': 'Pet not found'}, status=404)
+    except ValueError as e:
+        print(f"Error in unwag method: {str(e)}")
+        return Response({'error': str(e)}, status=404)
     except Exception as e:
         print(f"Unexpected error: {str(e)}")
         return Response({'error': str(e)}, status=400)
@@ -394,16 +328,12 @@ def get_followers(request):
         user_pet = Pet.objects.get(owner=request.user)
         followers_data = []
         
-        for follower in user_pet.followers.all():
+        for follower_pet in user_pet.followers.all():
             try:
-                follower_pet = Pet.objects.get(owner=follower)
                 followers_data.append({
                     'id': follower_pet.id,
                     'name': follower_pet.name,
-                    'hasWaggedBack': WagHistory.objects.filter(
-                        wagger=request.user,
-                        wagged_to=follower
-                    ).exists(),
+                    'isFriend': user_pet.is_friend(follower_pet.id),
                     'photo': follower_pet.photos[0] if follower_pet.photos else None
                 })
             except Pet.DoesNotExist:
@@ -412,28 +342,31 @@ def get_followers(request):
         return Response({'followers': followers_data}, status=200)
     except Pet.DoesNotExist:
         return Response({'error': 'Pet not found'}, status=404)
+    except Exception as e:
+        return Response({'error': str(e)}, status=400)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def wag_back(request, follower_id):
     try:
-        follower_pet = Pet.objects.get(id=follower_id)
         user_pet = Pet.objects.get(owner=request.user)
         
-        WagHistory.objects.create(
-            wagger=request.user,
-            wagged_to=follower_pet.owner
-        )
+        # WagHistory.objects.create(
+        #     wagger=request.user,
+        #     wagged_to=follower_pet.owner
+        # )
         
-        follower_pet.followers.add(request.user)
-        user_pet.following.add(follower_pet.owner)
+        user_pet.wag(follower_id)
         
         return Response({
             'message': 'Successfully wagged back',
             'isFollowing': True
         }, status=200)
+    
     except Pet.DoesNotExist:
         return Response({'error': 'Pet not found'}, status=404)
+    except ValueError as e:
+        return Response({'error': str(e)}, status=404)
     except Exception as e:
         return Response({'error': str(e)}, status=400)
     
@@ -452,35 +385,16 @@ def check_pet_exists(request):
 def update_pet(request):
     try:
         pet_data = request.data
-        if not isinstance(pet_data.get('health_states'), list):
-            return Response({'error': 'Health states must be a list.'}, status=400)
-        if not isinstance(pet_data.get('characters'), list):
-            return Response({'error': 'Characters must be a list.'}, status=400)
-        if not isinstance(pet_data.get('red_flags'), list):
-            return Response({'error': 'Red flags must be a list.'}, status=400)
-        
-        try:
-            user_profile = UserProfile.objects.get(user=request.user)
-            pet = user_profile.pet
-        except UserProfile.DoesNotExist:
-            return Response({'error': 'User profile not found'}, status=404)
-        except Pet.DoesNotExist:
-            return Response({'error': 'Pet not found'}, status=404)
-
-        pet.name = pet_data['name']
-        pet.sex = pet_data['sex']
-        pet.preferred_time = pet_data['preferred_time']
-        pet.breed = pet_data['breed']
-        pet.birth_date = pet_data['birth_date']
-        pet.location = pet_data['location']
-        pet.weight = float(pet_data['weight'])
-        pet.health_states = pet_data['health_states']
-        pet.characters = pet_data['characters']
-        pet.red_flags = pet_data['red_flags']
-        pet.photos = pet_data.get('photos', [])
-        
-        pet.save()
+        user_profile = UserProfile.objects.get(user=request.user)
+        pet = user_profile.pet
+        pet.update_pet(pet_data)
 
         return Response({'message': 'Pet profile updated successfully'}, status=200)
+    except Exception as e:
+        return Response({'error': str(e)}, status=400)
+    except UserProfile.DoesNotExist:
+        return Response({'error': 'User profile not found'}, status=404)
+    except Pet.DoesNotExist:
+        return Response({'error': 'Pet not found'}, status=404)
     except Exception as e:
         return Response({'error': str(e)}, status=400)
