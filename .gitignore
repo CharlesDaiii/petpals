@@ -11,3 +11,6 @@ media
 config.ini
 node_modules
 .env
+/build/
+/dist/
+asset-manifest.json
