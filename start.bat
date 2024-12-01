@@ -16,3 +16,4 @@ python petpal\manage.py runserver
 REM python petpal\manage.py create_fake_pets   # Uncomment to create fake pets
 REM python petpal\manage.py createsuperuser
 REM python petpal\manage.py flush              # Uncomment to flush database
+REM python petpal\manage.py collectstatic      # Uncomment to collect static files
