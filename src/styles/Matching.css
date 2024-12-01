@@ -1,5 +1,4 @@
 .matching-container {
-    padding-top: 20px;
     background-color: #fedcd2;
     min-height: 100vh;
     width: 100%;
@@ -8,8 +7,7 @@
     align-items: center;
     position: relative;
     overflow: hidden;
-    padding-top: 50px; /* 根据 AppHeader 的高度设置 */
-    
+    /* padding-top: 50px; 根据 AppHeader 的高度设置 */
 }
 
 .cards-container {
