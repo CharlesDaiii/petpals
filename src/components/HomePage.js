@@ -93,7 +93,7 @@ function HomePage() {
         </button>
       </header>
 
-      {/* 其余内容 */}
+      {/* Other Content */}
       <div className="home-header-section">
         <img className="HeaderImage" src={`${process.env.PUBLIC_URL}/image/header.jpg`} alt="Header" />
         <div className="home-intro-text">
