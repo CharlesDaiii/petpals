@@ -21,7 +21,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # switch to 'http://localhost:3000' for development
-# FRONTEND_URL = "http://team20.cmu-webapps.com"
+# FRONTEND_URL = "http://team20.cmu-webapps.com:8000"
 FRONTEND_URL = "http://localhost:3000"
 BACKEND_URL = "http://localhost:8000"
 
