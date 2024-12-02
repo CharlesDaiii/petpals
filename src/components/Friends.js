@@ -222,6 +222,7 @@ const Friends = () => {
             <div className="dropdown-menu">
               <button onClick={() => navigateTo("Homepage")}>Homepage</button>
               <button onClick={() => navigateTo("/MyProfile")}>Profile</button>
+              <button onClick={() => navigateTo("/Matching")}>Matching</button>
             </div>
           )}
         </div>

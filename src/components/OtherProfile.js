@@ -76,13 +76,14 @@ const OtherProfile = () => {
   useEffect(() => {
     const fetchPetData = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/user-pet/${id}`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/user-pet/${id}/`, {
           method: "GET",
           credentials: "include",
         });
         
         if (response.ok) {
           const data = await response.json();
+          console.log("data", data);
           setPetData(data);
         } else {
           throw new Error(`Failed to fetch pet data: ${response.status}`);
