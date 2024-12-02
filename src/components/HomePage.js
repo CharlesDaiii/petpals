@@ -84,6 +84,7 @@ function HomePage() {
             <div className="dropdown-menu">
               <button onClick={() => navigateTo('/MyProfile')}>Profile</button>
               <button onClick={() => navigateTo('/Friends')}>Friends</button>
+              <button onClick={() => navigateTo('/Matching')}>Matching</button>
             </div>
           )}
         </div>
