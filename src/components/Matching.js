@@ -222,6 +222,13 @@ export const Matching = () => {
                     <Loading />
                 </div>
                 )
+            ) : !isLogin ? (
+                <div className="no-login-message">
+                    <h2>Please login first</h2>
+                    <button onClick={() => window.location.href = '/Register'}>
+                        Login / Register
+                    </button>
+                </div>
             ) : !userPet ? (
                 <div className="no-pet-message">
                     <h2>Please set up your pet profile first</h2>

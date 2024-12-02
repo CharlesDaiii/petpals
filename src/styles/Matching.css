@@ -523,3 +523,70 @@ header.AppHeader {
     justify-content: flex-end;
     align-items: center;
 }
+
+.no-login-message,
+.no-pet-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    margin-top: 100px;
+    background-color: white;
+    border-radius: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 400px;
+}
+
+.no-login-message h2,
+.no-pet-message h2 {
+    color: #735858;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.no-login-message button,
+.no-pet-message button {
+    background-color: #ec847c;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 200px;
+    text-align: center;
+}
+
+.no-login-message button:hover,
+.no-pet-message button:hover {
+    background-color: #d67670;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 768px) {
+    .no-login-message,
+    .no-pet-message {
+        width: 95%;
+        padding: 30px;
+        margin-top: 80px;
+    }
+
+    .no-login-message h2,
+    .no-pet-message h2 {
+        font-size: 20px;
+    }
+
+    .no-login-message button,
+    .no-pet-message button {
+        padding: 12px 25px;
+        font-size: 16px;
+        width: 180px;
+    }
+}
