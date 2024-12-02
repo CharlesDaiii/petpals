@@ -83,9 +83,14 @@ const Friends = () => {
         if (response.ok) {
           setIsLogin(false);
           setUsername("");
+          window.location.href = '/Register';
         }
       })
       .catch((err) => console.error("Logout error:", err));
+  };
+
+  const handleLoginClick = () => {
+    window.location.href = '/Register';
   };
 
   const handleMouseEnter = () => setShowMenu(true);
@@ -226,7 +231,10 @@ const Friends = () => {
             </div>
           )}
         </div>
-        <button className="header-button" onClick={handleLogout}>
+        <button 
+          className="header-button" 
+          onClick={isLogin ? handleLogout : handleLoginClick}
+        >
           {isLogin ? "Logout" : "Login"}
         </button>
       </header>
