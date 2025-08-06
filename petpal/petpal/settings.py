@@ -23,16 +23,17 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # switch to 'http://localhost:3000' for development
 FRONTEND_URL = "http://localhost:3000"
 # BACKEND_URL = "http://localhost:8000"
-BACKEND_URL = "http://team20.cmu-webapps.com:8000"
+BACKEND_URL = "http://localhost:8000"
 
 # ========== Configuration ========== #
 CONFIG = ConfigParser()
 CONFIG.read(BASE_DIR / "config.ini")
 
 # ========== Security ========== #
-SECRET_KEY = CONFIG.get("Django", "Secret")
+# SECRET_KEY = CONFIG.get("Django", "Secret")
+SECRET_KEY = 'django-insecure-localhost-development-key-only'  # Default key for localhost development
 DEBUG = True
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'team20.cmu-webapps.com','3.15.252.217']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 # ========== Applications ========== #
 INSTALLED_APPS = [
@@ -148,7 +149,7 @@ except:
 
 # ========== Login/Redirect Configuration ========== #
 LOGIN_URL = f"{FRONTEND_URL}/Register"
-SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = f"{BACKEND_URL}/auth/complete/google-oauth2/"
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = f"{BACKEND_URL}/oauth/complete/google-oauth2/"
 LOGIN_REDIRECT_URL = FRONTEND_URL
 
 # ========== Allowed Path Suffixes ========== #
@@ -176,4 +177,5 @@ except KeyError:
 OPENAI_API_KEY = CONFIG.get("OpenAI", "API_KEY")
 
 # ========== CORS Policy for Development ========== #
-CORS_ALLOW_ALL_ORIGINS = True
+# Only allow localhost origins for security
+# CORS_ALLOW_ALL_ORIGINS = True

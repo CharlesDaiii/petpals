@@ -15,4 +15,4 @@ python petpal/manage.py migrate
 #
 ## Step 4: Start Django development server
 echo "Starting Django development server..."
-python petpal/manage.py runserver 0.0.0.0:8000  # Allow external connections for testing
+python petpal/manage.py runserver localhost:8000  # Run on localhost only
