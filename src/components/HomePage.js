@@ -51,24 +51,27 @@ function HomePage() {
     protectRedirect("", "/ProfileSignUp");
   };
 
-  const handleLogin = async () => {
+  const handleLogout = async () => {
     if (!isLogin) {
       window.location.href = "/Register";
     } else {
       try {
-        const csrfToken = await getCSRFToken();
         const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken || '',
+              "Content-Type": "application/json",
+              "X-CSRFToken": await getCSRFToken(),
           },
-          credentials: 'include',
+          credentials: "include",
         });
         
         if (response.ok) {
           setIsLogin(false);
           setUsername("");
+          if (typeof(Storage) !== "undefined") {
+            sessionStorage.clear();
+            localStorage.clear();
+          }
         } else {
           console.error('Logout failed:', response.status, response.statusText);
         }
@@ -95,7 +98,7 @@ function HomePage() {
             </div>
           )}
         </div>
-        <button className="header-button" onClick={handleLogin}>
+        <button className="header-button" onClick={handleLogout}>
           {isLogin ? "Logout" : "Login"}
         </button>
       </header>
