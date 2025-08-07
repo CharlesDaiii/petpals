@@ -1,14 +1,14 @@
-# nixpacks.toml — 延迟数据库迁移到运行时执行
-providers = []
+# nixpacks.toml — 明确启用 Python provider 来确保 pip 可用
+providers = ["python3"]
 
 [phases.setup]
-# 安装带 pip 的 Python
-nixPkgs = ["python311Full", "poetry", "gcc", "postgresql"]
+# 使用带 pip 的 Python
+nixPkgs = ["python311Full", "gcc", "postgresql"]
 
 [phases.build]
 cmds = [
-  "echo 'Building without touching the database...'",
-  "pip install -r requirements.txt"
+  "echo 'Building without touching the database...'"
+  # 无需手动安装依赖，让 provider 来处理 pip install
 ]
 
 [start]
