@@ -156,27 +156,14 @@ if IS_PRODUCTION:
     # Production database (PostgreSQL on Railway)
     import dj_database_url
     
-    # Get DATABASE_URL from environment
-    database_url = os.getenv('DATABASE_URL')
-    
-    if database_url:
-        # Use Railway's DATABASE_URL
-        DATABASES = {
-            'default': dj_database_url.config(
-                default=database_url,
-                conn_max_age=600,
-                conn_health_checks=True,
-            )
-        }
-    else:
-        # Fallback to SQLite for build phase (when DATABASE_URL not available)
-        print("[DEBUG] DATABASE_URL not found, using SQLite fallback for build phase")
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db_build.sqlite3',
-            }
-        }
+    # Always use dj_database_url.config() - Railway will provide DATABASE_URL at runtime
+    DATABASES = {
+        'default': dj_database_url.config(
+            # Don't provide a default - let it fail gracefully during build if no DATABASE_URL
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
 else:
     # Development database (SQLite)
     DATABASES = {
