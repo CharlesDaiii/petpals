@@ -141,13 +141,31 @@ WSGI_APPLICATION = "petpal.wsgi.application"
 if IS_PRODUCTION:
     # Production database (PostgreSQL on Railway)
     import dj_database_url
-    DATABASES = {
-        'default': dj_database_url.config(
-            # Railway automatically provides DATABASE_URL
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
+    
+    # Get DATABASE_URL from environment
+    database_url = os.getenv('DATABASE_URL')
+    
+    if database_url:
+        # Use Railway's DATABASE_URL
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=database_url,
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        }
+    else:
+        # Fallback PostgreSQL config for build phase
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': 'railway',
+                'USER': 'postgres',
+                'PASSWORD': 'password',
+                'HOST': 'localhost',
+                'PORT': '5432',
+            }
+        }
 else:
     # Development database (SQLite)
     DATABASES = {
