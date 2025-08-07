@@ -49,12 +49,13 @@ def oauth_redirect(request):
 def profile_signup_redirect(request):
     return redirect(f'{settings.FRONTEND_URL}/ProfileSignUp')
 
-@login_required
+@api_view(['POST'])
+@csrf_exempt
 def api_logout(request):
-    if request.method == 'POST':
+    if request.user.is_authenticated:
         logout(request)
-        return JsonResponse({"message": "Successfully logged out"}, status=200)
-    return JsonResponse({"error": "Invalid request method"}, status=400)
+        return Response({"message": "Successfully logged out"}, status=200)
+    return Response({"message": "Already logged out"}, status=200)
 
 def home(request):
     return render(request, 'api/home.html')
