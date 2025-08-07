@@ -139,9 +139,17 @@ class PetFormView(View):
         return render(request, 'api/pet_form.html', {'form': form})
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def profile_setup(request):
     try:
+        # 添加调试信息
+        print(f"User authenticated: {request.user.is_authenticated}")
+        print(f"User: {request.user}")
+        print(f"Session key: {request.session.session_key}")
+        
+        if not request.user.is_authenticated:
+            return Response({'error': 'User not authenticated'}, status=401)
+        
         pet_data = request.data
         pet = Pet.create_pet(user=request.user, pet_data=pet_data)
 
