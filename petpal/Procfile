@@ -1,0 +1,2 @@
+web: gunicorn petpal.wsgi --log-file -
+release: python manage.py migrate

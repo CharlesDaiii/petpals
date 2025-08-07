@@ -30,7 +30,7 @@ const OtherProfile = () => {
   };
 
   const handleLogout = () => {
-    fetch(`${process.env.REACT_APP_BACKEND}/api/logout/`, {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -50,7 +50,7 @@ const OtherProfile = () => {
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND}/auth/redirect/`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/redirect/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -76,7 +76,7 @@ const OtherProfile = () => {
   useEffect(() => {
     const fetchPetData = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/user-pet/${id}/`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user-pet/${id}/`, {
           method: "GET",
           credentials: "include",
         });
@@ -96,7 +96,7 @@ const OtherProfile = () => {
 
     const fetchFriendsData = async () => {
       try {
-        const followersResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/followers/?id=${id}`, {
+        const followersResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/followers/?id=${id}`, {
           credentials: "include",
         });
         if (followersResponse.ok) {
@@ -104,7 +104,7 @@ const OtherProfile = () => {
           setFollowersCount(data.followers_count || 0);
         }
 
-        const followingResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/following/?id=${id}`, {
+        const followingResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/following/?id=${id}`, {
           credentials: "include",
         });
         if (followingResponse.ok) {

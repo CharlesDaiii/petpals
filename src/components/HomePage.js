@@ -11,7 +11,7 @@ function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND}/auth/redirect/`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/redirect/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ function HomePage() {
     if (!isLogin) {
       window.location.href = "/Register";
     } else {
-      fetch(`${process.env.REACT_APP_BACKEND}/api/logout/`, {
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

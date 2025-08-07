@@ -13,7 +13,7 @@ const Friends = () => {
 
   const updateData = async (endpoint, setState) => {
     try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND}${endpoint}`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}${endpoint}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ const Friends = () => {
   // Fetch login state and username
   const fetchUserData = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND}/auth/redirect/`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/redirect/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -71,7 +71,7 @@ const Friends = () => {
   };
 
   const handleLogout = () => {
-    fetch(`${process.env.REACT_APP_BACKEND}/api/logout/`, {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -114,7 +114,7 @@ const Friends = () => {
         : `/api/unfollow-pet/${petId}/`;
   
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND}${endpoint}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}${endpoint}`, {
         method: "POST",
         credentials: "include",
         headers: {

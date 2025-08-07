@@ -179,7 +179,7 @@ const ProfileSignUp = () => {
             }
 
             try {
-                const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/check-pet-exists/`, {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/check-pet-exists/`, {
                     method: "GET",
                     credentials: "include",
                 });
@@ -225,7 +225,7 @@ const ProfileSignUp = () => {
     
         try {
             const csrfToken = getCSRFToken();
-            const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/upload-photos/`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/upload-photos/`, {
                 method: "POST",
                 headers: {
                     "X-CSRFToken": csrfToken,
@@ -286,8 +286,8 @@ const ProfileSignUp = () => {
 
             const response = await fetch(
                 isEditing
-                    ? `${process.env.REACT_APP_BACKEND}/api/update-pet/`
-                    : `${process.env.REACT_APP_BACKEND}/api/ProfileSignUp/`,
+                    ? `${process.env.REACT_APP_BACKEND_URL}/api/update-pet/`
+                    : `${process.env.REACT_APP_BACKEND_URL}/api/ProfileSignUp/`,
                 {
                     method: "POST",
                     headers: {
@@ -415,7 +415,7 @@ const ProfileSignUp = () => {
         if (from === 'MyProfile') {
             const fetchExistingPetData = async () => {
                 try {
-                    const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/user-pet/`, {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user-pet/`, {
                         method: "GET",
                         credentials: "include",
                     });

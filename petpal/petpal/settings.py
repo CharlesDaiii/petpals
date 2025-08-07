@@ -10,10 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 from configparser import ConfigParser
-import os
 from django.conf.urls.static import static
+
+# Check if we're in production (Railway sets RAILWAY_ENVIRONMENT)
+if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('DJANGO_SETTINGS_MODULE') == 'petpal.settings_production':
+    from .settings_production import *
+else:
+    # Continue with development settings below
+    pass
 
 # ========== Paths ========== #
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -65,6 +72,16 @@ MIDDLEWARE = [
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
 CSRF_TRUSTED_ORIGINS = [FRONTEND_URL]
+
+# For development - allow localhost
+CORS_ALLOWED_ORIGINS.extend([
+    "http://localhost:3000",
+    "https://localhost:3000",
+])
+CSRF_TRUSTED_ORIGINS.extend([
+    "http://localhost:3000", 
+    "https://localhost:3000",
+])
 
 # ========== URL Configuration ========== #
 ROOT_URLCONF = "petpal.urls"

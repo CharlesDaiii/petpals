@@ -16,7 +16,7 @@ const MyProfile = () => {
     // Fetch login state and username
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND}/auth/redirect/`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/redirect/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -41,7 +41,7 @@ const MyProfile = () => {
     // Fetch pet data
     const fetchPetData = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND}/api/user-pet/`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user-pet/`, {
           method: "GET",
           credentials: "include",
         });
@@ -63,7 +63,7 @@ const MyProfile = () => {
     // Add new fetch for followers and following
     const fetchFriendsData = async () => {
       try {
-        const followersResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/followers/`, {
+        const followersResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/followers/`, {
           credentials: "include",
         });
         if (followersResponse.ok) {
@@ -71,7 +71,7 @@ const MyProfile = () => {
           setFollowers(followersData.followers);
         }
 
-        const followingResponse = await fetch(`${process.env.REACT_APP_BACKEND}/api/following/`, {
+        const followingResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/following/`, {
           credentials: "include",
         });
         if (followingResponse.ok) {
@@ -87,7 +87,7 @@ const MyProfile = () => {
   }, []);
 
   const handleLogout = () => {
-    fetch(`${process.env.REACT_APP_BACKEND}/api/logout/`, {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
