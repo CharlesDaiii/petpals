@@ -271,7 +271,7 @@ if DEBUG and not os.getenv('RAILWAY_ENVIRONMENT'):
             f.write(f"REACT_APP_GOOGLE_CLIENT_ID={SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}\n")
             if GOOGLE_MAPS_API_KEY:
                 f.write(f"REACT_APP_GOOGLE_MAPS_API_KEY={GOOGLE_MAPS_API_KEY}\n")
-            f.write(f"REACT_APP_BACKEND={BACKEND_URL}\n")
+            f.write(f"REACT_APP_BACKEND_URL={BACKEND_URL}\n")
         print(f".env file generated successfully at {env_path} with client_id.")
     except Exception as e:
         print(f"Warning: Could not generate .env file: {e}")
