@@ -7,7 +7,7 @@ echo "🚀 准备部署 PetPals 到 Vercel 和 Railway..."
 echo "📋 检查配置文件..."
 required_files=(
     "vercel.json"
-    "petpal/requirements-production.txt"
+    "petpal/requirements.txt"
     "petpal/Procfile"
     "petpal/railway.json"
     "petpal/nixpacks.toml"

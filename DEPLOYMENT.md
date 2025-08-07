@@ -93,10 +93,10 @@ ADDITIONAL_FRONTEND_URLS=https://example.com,https://www.example.com
 - 本地开发可继续使用SQLite
 
 ### 自定义构建配置
-- 使用`nixpacks.toml`指定Python版本和依赖文件
-- 自动使用`requirements-production.txt`而非默认的`requirements.txt`
+- 使用`nixpacks.toml`指定Python版本和构建流程
+- 使用精简的生产依赖`requirements.txt`（原开发依赖已重命名为`requirements-dev.txt`）
 - 构建时自动收集Django静态文件
-- 使用自定义启动脚本`start.sh`
+- 使用Gunicorn作为WSGI服务器
 
 ## 🛠️ 本地开发设置
 
@@ -119,8 +119,10 @@ npm start
 ```bash
 cd petpal
 
-# 安装依赖 (建议使用虚拟环境)
-pip install -r requirements-production.txt
+# 安装开发依赖 (建议使用虚拟环境)
+pip install -r requirements-dev.txt
+# 或者使用生产依赖进行本地测试：
+# pip install -r requirements.txt
 
 # 创建本地环境变量文件 (.env)
 # 参考 .env.template 文件
