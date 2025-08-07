@@ -7,7 +7,7 @@ const Register = () => {
     const nextPage = encodeURIComponent(searchParams.get("next") || "");
 
     const handleLoginClick = async () => {
-        window.location.href = `https://${process.env.REACT_APP_BACKEND_URL}/oauth/login/google-oauth2/?next=${nextPage}`;
+        window.location.href = `${process.env.REACT_APP_BACKEND_URL}/oauth/login/google-oauth2/?next=${nextPage}`;
     }
 
     // Handle the "Back to Home" button click
