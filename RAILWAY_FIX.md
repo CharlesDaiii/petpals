@@ -88,4 +88,34 @@ Pillow==10.0.1
 - ✅ 使用稳定的版本号
 - ✅ 避免了模块导入错误
 
+## 🌐 第四个修复：ALLOWED_HOSTS错误
+
+### 问题描述
+```
+DisallowedHost at /api
+Invalid HTTP_HOST header: 'petpals-production-9218.up.railway.app'
+```
+
+### 解决方案
+在Django settings.py中更新了ALLOWED_HOSTS配置：
+
+```python
+ALLOWED_HOSTS = [
+    '127.0.0.1', 
+    'localhost',
+    '.railway.app',  # Allow all Railway subdomains
+    '.vercel.app',   # Allow Vercel domains for CORS
+]
+
+# Add Railway public domain if available
+if os.getenv('RAILWAY_PUBLIC_DOMAIN'):
+    ALLOWED_HOSTS.append(os.getenv('RAILWAY_PUBLIC_DOMAIN'))
+```
+
+### 优势
+- ✅ 支持所有Railway子域名
+- ✅ 支持Vercel域名（用于CORS）
+- ✅ 本地开发环境兼容
+- ✅ 动态添加自定义域名
+
 ## 现在可以正常部署了！ 🚀

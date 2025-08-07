@@ -40,7 +40,16 @@ CONFIG.read(BASE_DIR / "config.ini")
 # SECRET_KEY = CONFIG.get("Django", "Secret")
 SECRET_KEY = 'django-insecure-localhost-development-key-only'  # Default key for localhost development
 DEBUG = True
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = [
+    '127.0.0.1', 
+    'localhost',
+    '.railway.app',  # Allow all Railway subdomains
+    '.vercel.app',   # Allow Vercel domains for CORS
+]
+
+# Add Railway public domain if available
+if os.getenv('RAILWAY_PUBLIC_DOMAIN'):
+    ALLOWED_HOSTS.append(os.getenv('RAILWAY_PUBLIC_DOMAIN'))
 
 # ========== Applications ========== #
 INSTALLED_APPS = [
