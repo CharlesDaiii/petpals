@@ -146,4 +146,76 @@ def index(request):
 - ✅ 列出了可用的API端点
 - ✅ 保持了开发环境兼容性
 
+## 🔧 第六个修复：URL配置重复和冲突
+
+### 问题描述
+即使修复了views.py逻辑，仍然存在重定向循环，因为URL配置中有重复和冲突的路径匹配。
+
+### 解决方案
+1. **清理主URL配置**：移除重复的根路径配置
+2. **统一根路径处理**：使用api.views.api_status处理根路径
+3. **移除冲突的catch-all模式**：注释掉可能导致循环的re_path
+
+**修改前**（有冲突）：
+```python
+urlpatterns = [
+    path('', views.index, name='index'),        # 冲突1
+    path('', include('api.urls')),              # 冲突2 (api.urls也有'')
+    re_path(r'^.*$', views.index),              # 冲突3 (catch-all)
+]
+```
+
+**修改后**（清晰明确）：
+```python
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('oauth/', include('social_django.urls', namespace='social')),
+    path('', include('api.urls')),              # 只有这一个根路径
+]
+```
+
+### 优势
+- ✅ 消除了URL路径冲突
+- ✅ 明确的路由优先级
+- ✅ 专用的API状态端点
+- ✅ 简洁的URL配置
+
+## 🔧 第七个修复：统一设置文件
+
+### 问题描述
+使用两个设置文件（`settings.py` 和 `settings_production.py`）导致配置复杂，可能出现设置冲突和覆盖问题。
+
+### 解决方案
+1. **合并为单个设置文件**：移除`settings_production.py`
+2. **使用环境变量分支**：基于`RAILWAY_ENVIRONMENT`进行条件配置
+3. **清晰的生产/开发区分**：所有配置都有明确的环境分支
+
+**主要改进**：
+```python
+# 环境检测
+IS_PRODUCTION = os.getenv('DJANGO_ENV') == 'production' or os.getenv('RAILWAY_ENVIRONMENT') is not None
+
+# 条件配置示例
+if IS_PRODUCTION:
+    # 生产环境配置
+    SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', '...')
+    DEBUG = False
+    DATABASES = {dj_database_url配置...}
+    MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
+else:
+    # 开发环境配置
+    SECRET_KEY = 'development-key'
+    DEBUG = True
+    DATABASES = {SQLite配置...}
+```
+
+### 优势
+- ✅ 消除了双文件配置冲突
+- ✅ 简化了部署流程
+- ✅ 更清晰的环境区分
+- ✅ 减少了配置错误的可能性
+
+### Railway环境变量
+在Railway中设置：`DJANGO_ENV=production`
+
 ## 现在可以正常部署了！ 🚀
