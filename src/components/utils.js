@@ -28,13 +28,16 @@ const handleLogout = async (isLogin, setIsLogin, setUsername, getCSRFToken) => {
     }
 };
 
-// upload photo event handler function
 const handlePhotoUpload = async (event, photos, setPhotos, getCSRFToken) => {
     const files = event.target.files;
     if (!files.length) return;
 
     const formData = new FormData();
     const updatedPhotos = [...photos];
+    
+    // 记录哪些位置放置了新的blob URL
+    const newBlobIndexes = [];
+    
     Array.from(files).forEach((file, index) => {
         formData.append("photos", file);
         
@@ -42,6 +45,7 @@ const handlePhotoUpload = async (event, photos, setPhotos, getCSRFToken) => {
         const firstEmptyIndex = updatedPhotos.indexOf(null);
         if (firstEmptyIndex !== -1) {
             updatedPhotos[firstEmptyIndex] = URL.createObjectURL(file);
+            newBlobIndexes.push(firstEmptyIndex); // 记录这个位置
         }
     });
 
@@ -62,29 +66,29 @@ const handlePhotoUpload = async (event, photos, setPhotos, getCSRFToken) => {
         if (response.ok) {
             const data = await response.json();
             console.log("Upload successful, photo URLs:", data.photos);
-            // 用服务器返回的URL替换本地预览URL
-            const finalPhotos = [...photos];
-
-            const blobIndexes = [];
-            finalPhotos.forEach((photo, index) => {
-                if (photo && photo.startsWith('blob:')) {
-                    blobIndexes.push(index);
-                }
-            });
-
+            console.log("New blob indexes:", newBlobIndexes);
+            
+            // 用服务器返回的URL替换刚才创建的blob URL
+            const finalPhotos = [...updatedPhotos]; // 使用updatedPhotos而不是photos
+            
+            // 按顺序替换刚才上传的blob URL
             data.photos.forEach((serverUrl, index) => {
-                if (blobIndexes[index] !== undefined) {
-                    finalPhotos[blobIndexes[index]] = serverUrl;
+                if (newBlobIndexes[index] !== undefined) {
+                    const replaceIndex = newBlobIndexes[index];
+                    console.log(`Replacing blob at index ${replaceIndex} with server URL: ${serverUrl}`);
+                    finalPhotos[replaceIndex] = serverUrl;
                 }
             });
+            
+            console.log("Final photos after replacement:", finalPhotos);
             setPhotos(finalPhotos);
         } else {
             console.error("Failed to upload photos.");
-            setPhotos(photos);
+            setPhotos(updatedPhotos); // 保持预览状态
         }
     } catch (error) {
         console.error("Photo upload error:", error);
-        setPhotos(photos);
+        setPhotos(updatedPhotos); // 保持预览状态
     }
 };
 
