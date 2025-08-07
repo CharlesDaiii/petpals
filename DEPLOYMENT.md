@@ -138,19 +138,24 @@ python manage.py runserver
 
 ### 常见问题
 
-1. **CORS错误**
+1. **ConfigParser错误 (NoSectionError)**
+   - 确保在Railway中设置了所有必需的环境变量
+   - Django已配置为在config.ini不可用时使用环境变量
+   - 必需变量：`GOOGLE_OAUTH2_CLIENT_ID`, `GOOGLE_OAUTH2_CLIENT_SECRET`, `GOOGLE_MAPS_API_KEY`, `OPENAI_API_KEY`
+
+2. **CORS错误**
    - 确保FRONTEND_URL环境变量设置正确
    - 检查Vercel部署的实际URL
 
-2. **OAuth登录失败**
+3. **OAuth登录失败**
    - 验证Google OAuth配置
    - 确保redirect URI包含Railway域名
 
-3. **静态文件404**
+4. **静态文件404**
    - 运行 `python manage.py collectstatic`
    - 检查STATIC_ROOT配置
 
-4. **数据库连接失败**
+5. **数据库连接失败**
    - 验证DATABASE_URL格式
    - 确保PostgreSQL服务已启动
 

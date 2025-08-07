@@ -152,8 +152,15 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
 )
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CONFIG.get("GoogleOAuth2", "client_id")
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.get("GoogleOAuth2", "client_secret")
+# Social Auth configuration with fallback to environment variables
+try:
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CONFIG.get("GoogleOAuth2", "client_id")
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.get("GoogleOAuth2", "client_secret")
+except:
+    # Fallback to environment variables for production
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('GOOGLE_OAUTH2_CLIENT_ID', '')
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET', '')
+
 SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {"prompt": "select_account"}
 SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ["fullname", "picture", "email"]
 
@@ -161,8 +168,8 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ["fullname", "picture", "email"]
 try:
     GOOGLE_MAPS_API_KEY = CONFIG.get("GoogleMaps", "API_KEY")
 except:
-    print("Error: 'API_KEY' not found in config.ini under [GoogleMaps] section.")
-    GOOGLE_MAPS_API_KEY = ""
+    # Fallback to environment variables for production
+    GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY', '')
 
 # ========== Login/Redirect Configuration ========== #
 LOGIN_URL = f"{FRONTEND_URL}/Register"
@@ -179,19 +186,25 @@ ALLOWED_PATH_SUFFIXES = [
 ]
 
 # ========== Environment Variables ========== #
-env_path = BASE_DIR.parent / ".env"
-try:
-    with open(env_path, "w") as f:
-        f.write(f"REACT_APP_GOOGLE_CLIENT_ID={SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}\n")
-        if GOOGLE_MAPS_API_KEY:
-            f.write(f"REACT_APP_GOOGLE_MAPS_API_KEY={GOOGLE_MAPS_API_KEY}\n")
-        f.write(f"REACT_APP_BACKEND={BACKEND_URL}\n")
-    print(f".env file generated successfully at {env_path} with client_id.")
-except KeyError:
-    print("Error: 'client_id' not found in config.ini under [GoogleOAuth2] section.")
+# Only generate .env file in development environment
+if DEBUG and not os.getenv('RAILWAY_ENVIRONMENT'):
+    env_path = BASE_DIR.parent / ".env"
+    try:
+        with open(env_path, "w") as f:
+            f.write(f"REACT_APP_GOOGLE_CLIENT_ID={SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}\n")
+            if GOOGLE_MAPS_API_KEY:
+                f.write(f"REACT_APP_GOOGLE_MAPS_API_KEY={GOOGLE_MAPS_API_KEY}\n")
+            f.write(f"REACT_APP_BACKEND={BACKEND_URL}\n")
+        print(f".env file generated successfully at {env_path} with client_id.")
+    except Exception as e:
+        print(f"Warning: Could not generate .env file: {e}")
 
-# ========== API Keys ========== #
-OPENAI_API_KEY = CONFIG.get("OpenAI", "API_KEY")
+# ========== OpenAI API Key ========== #
+try:
+    OPENAI_API_KEY = CONFIG.get("OpenAI", "API_KEY")
+except:
+    # Fallback to environment variables for production
+    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 
 # ========== CORS Policy for Development ========== #
 # Only allow localhost origins for security

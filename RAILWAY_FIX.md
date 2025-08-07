@@ -39,4 +39,30 @@ exit code: 127 (命令未找到)
 - ✅ 自动收集静态文件
 - ✅ 使用Gunicorn作为生产WSGI服务器
 
+## 📝 额外修复：ConfigParser错误
+
+### 问题描述
+```
+configparser.NoSectionError: No section: 'GoogleOAuth2'
+```
+
+### 解决方案
+在Django settings.py中添加了try-catch处理，当config.ini文件不可用时自动使用环境变量：
+
+```python
+try:
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CONFIG.get("GoogleOAuth2", "client_id")
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CONFIG.get("GoogleOAuth2", "client_secret")
+except:
+    # Fallback to environment variables for production
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('GOOGLE_OAUTH2_CLIENT_ID', '')
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET', '')
+```
+
+### 优势
+- ✅ 本地开发仍可使用config.ini
+- ✅ 生产环境使用环境变量
+- ✅ 向后兼容性好
+- ✅ 不会再出现ConfigParser错误
+
 ## 现在可以正常部署了！ 🚀
