@@ -169,15 +169,12 @@ if IS_PRODUCTION:
             )
         }
     else:
-        # Fallback PostgreSQL config for build phase
+        # Fallback to SQLite for build phase (when DATABASE_URL not available)
+        print("[DEBUG] DATABASE_URL not found, using SQLite fallback for build phase")
         DATABASES = {
             'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': 'railway',
-                'USER': 'postgres',
-                'PASSWORD': 'password',
-                'HOST': 'localhost',
-                'PORT': '5432',
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db_build.sqlite3',
             }
         }
 else:
