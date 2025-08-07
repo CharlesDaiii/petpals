@@ -244,4 +244,46 @@ BACKEND_URL = os.getenv('BACKEND_URL', 'https://localhost:8000').rstrip('/')
 - ✅ 保持URL配置的一致性
 - ✅ 自动处理环境变量中的格式问题
 
+## 🔧 第九个修复：数据库配置错误
+
+### 问题描述
+Railway构建失败，出现数据库配置错误：
+```
+django.core.exceptions.ImproperlyConfigured: settings.DATABASES is improperly configured. 
+Please supply the ENGINE value.
+```
+
+### 解决方案
+修复数据库配置逻辑，处理Railway构建阶段`DATABASE_URL`不可用的情况：
+
+**问题原因**：
+- Railway在构建阶段可能不提供`DATABASE_URL`环境变量
+- `dj_database_url.config()`在没有URL时返回空配置
+- Django migrate命令需要有效的数据库配置
+
+**修复代码**：
+```python
+if IS_PRODUCTION:
+    database_url = os.getenv('DATABASE_URL')
+    
+    if database_url:
+        # 运行时：使用Railway的DATABASE_URL
+        DATABASES = {'default': dj_database_url.config(...)}
+    else:
+        # 构建时：使用PostgreSQL fallback配置
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': 'railway',
+                # ... 其他配置
+            }
+        }
+```
+
+### 优势
+- ✅ 解决Railway构建阶段数据库配置问题
+- ✅ 运行时正确使用Railway PostgreSQL
+- ✅ 构建时提供有效的fallback配置
+- ✅ 确保Django migrate命令能正常执行
+
 ## 现在可以正常部署了！ 🚀
