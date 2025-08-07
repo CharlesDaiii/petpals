@@ -48,7 +48,7 @@ CONFIG.read(BASE_DIR / "config.ini")
 # ========== Security ========== #
 if IS_PRODUCTION:
     SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-change-this-in-production')
-    DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+    DEBUG = False
     
     # Additional production security settings
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -58,12 +58,15 @@ else:
     # SECRET_KEY = CONFIG.get("Django", "Secret")
     SECRET_KEY = 'django-insecure-localhost-development-key-only'  # Default key for localhost development
     DEBUG = True
+
+# ========== Allowed Hosts ========== #
 if IS_PRODUCTION:
     ALLOWED_HOSTS = [
         'localhost',
         '127.0.0.1',
         '.railway.app',  # Allow all Railway subdomains
         '.vercel.app',   # Allow Vercel domains for CORS
+        'petpal.ruiyang.me'
     ]
     # Add Railway public domain if available
     if os.getenv('RAILWAY_PUBLIC_DOMAIN'):
