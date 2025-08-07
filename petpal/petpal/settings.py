@@ -25,9 +25,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # ========== Environment-specific URLs ========== #
 if IS_PRODUCTION:
-    # Production URLs
-    FRONTEND_URL = os.getenv('FRONTEND_URL', 'https://localhost:3000')
-    BACKEND_URL = os.getenv('BACKEND_URL', 'https://localhost:8000')
+    # Production URLs - strip trailing slashes for CORS compatibility
+    FRONTEND_URL = os.getenv('FRONTEND_URL', 'https://localhost:3000').rstrip('/')
+    BACKEND_URL = os.getenv('BACKEND_URL', 'https://localhost:8000').rstrip('/')
 else:
     # Development URLs  
     FRONTEND_URL = "http://localhost:3000"
