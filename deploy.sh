@@ -10,6 +10,7 @@ required_files=(
     "petpal/requirements-production.txt"
     "petpal/Procfile"
     "petpal/railway.json"
+    "petpal/nixpacks.toml"
     "petpal/petpal/settings_production.py"
 )
 

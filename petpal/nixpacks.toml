@@ -1,0 +1,23 @@
+# Nixpacks configuration for Railway deployment
+# This file customizes the build process for our Django app
+
+[variables]
+    NIXPACKS_PYTHON_VERSION = "3.11"
+
+[phases.install]
+    # Skip the default pip install command
+    skip = true
+    # Use our production requirements file
+    cmds = [
+        "pip install -r requirements-production.txt"
+    ]
+
+[phases.build]
+    # Collect static files during build
+    cmds = [
+        "python manage.py collectstatic --noinput"
+    ]
+
+[start]
+    # Use our custom start script
+    cmd = "./start.sh"

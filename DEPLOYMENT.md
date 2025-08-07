@@ -62,7 +62,7 @@ ADDITIONAL_FRONTEND_URLS=https://example.com,https://www.example.com
 3. **导入仓库**：选择"Deploy from GitHub repo"
 4. **配置设置**：
    - Root Directory: `petpal`
-   - 选择使用 `requirements-production.txt`
+   - Railway会自动检测`nixpacks.toml`并使用`requirements-production.txt`
 5. **添加数据库**：
    - 点击"Add Service" → "Database" → "PostgreSQL"
    - Railway会自动设置DATABASE_URL环境变量
@@ -91,6 +91,12 @@ ADDITIONAL_FRONTEND_URLS=https://example.com,https://www.example.com
 - Railway自动运行migrations
 - 支持PostgreSQL生产环境
 - 本地开发可继续使用SQLite
+
+### 自定义构建配置
+- 使用`nixpacks.toml`指定Python版本和依赖文件
+- 自动使用`requirements-production.txt`而非默认的`requirements.txt`
+- 构建时自动收集Django静态文件
+- 使用自定义启动脚本`start.sh`
 
 ## 🛠️ 本地开发设置
 
