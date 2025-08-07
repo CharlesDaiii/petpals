@@ -20,6 +20,7 @@ function HomePage() {
         });
 
         if (response.ok) {
+          console.log("response", response);
           const data = await response.json(); // Parse the JSON response
           if (data && data.is_authenticated) {
             setIsLogin(true);
