@@ -290,7 +290,9 @@ const ProfileSignUp = () => {
         };
     
         try {
-            const csrfToken = getCSRFToken();
+            const csrfToken = await getCSRFToken();
+            console.log('CSRF Token:', csrfToken);
+            console.log('All cookies:', document.cookie);
             const from = new URLSearchParams(window.location.search).get('from');
             const isEditing = from === 'MyProfile';
 
