@@ -415,8 +415,7 @@ const ProfileSignUp = () => {
                             birth_date: data.birth_date || "",
                             location: data.location || "",
                             weight: data.weight || "",
-                            health_states: data.health_states || [],
-                            photos: data.photos || Array(6).fill(null)
+                            health_states: data.health_states || []
                         });
                         
                         const existingCharacters = charactersList.filter(char => 
@@ -428,8 +427,14 @@ const ProfileSignUp = () => {
                             data.red_flags.includes(flag.name)
                         );
                         setSelectedFlags(existingFlags);
-                        
-                        setPhotos(data.photos || Array(6).fill(null));
+
+                        const fullPhotosArray = new Array(6).fill(null);
+                        data.photos.forEach((photo, index) => {
+                            if (index < 6) {
+                                fullPhotosArray[index] = photo;
+                            }
+                        });
+                        setPhotos(fullPhotosArray);
                     }
                 } catch (err) {
                     console.error("Error fetching existing pet data:", err);
