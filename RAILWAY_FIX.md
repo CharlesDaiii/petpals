@@ -118,4 +118,32 @@ if os.getenv('RAILWAY_PUBLIC_DOMAIN'):
 - ✅ 本地开发环境兼容
 - ✅ 动态添加自定义域名
 
+## 🔄 第五个修复：重定向循环问题
+
+### 问题描述
+```
+该网页无法正常运作
+petpals-production-9218.up.railway.app 将您重定向的次数过多
+```
+
+### 解决方案
+修复了petpal/views.py中的index视图，在生产环境中返回API状态而不是尝试加载不存在的React构建文件：
+
+```python
+def index(request):
+    # In production (Railway), return API status instead of React build
+    if not settings.DEBUG or os.getenv('RAILWAY_ENVIRONMENT'):
+        return JsonResponse({
+            'status': 'ok',
+            'message': 'PetPals API is running',
+            'api_endpoints': ['/api/', '/admin/', '/auth/redirect/']
+        })
+```
+
+### 优势
+- ✅ 消除了重定向循环
+- ✅ 提供了API状态信息
+- ✅ 列出了可用的API端点
+- ✅ 保持了开发环境兼容性
+
 ## 现在可以正常部署了！ 🚀
