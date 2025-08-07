@@ -148,9 +148,10 @@ const ProfileSignUp = () => {
                 }
                 break;
             case 'birth_date':
+                const currentYear = new Date().getFullYear();
                 const year = new Date(value).getFullYear();
-                if (year > 2024) {
-                    error = 'Birth year cannot be later than 2024';
+                if (year > currentYear) {
+                    error = `Birth year cannot be later than ${currentYear}`;
                     finalValue = '';
                 }
                 break;
