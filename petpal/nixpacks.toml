@@ -2,7 +2,8 @@
 providers = []
 
 [phases.setup]
-nixPkgs = ["python311", "poetry", "gcc", "postgresql"]  # 或你需要的 Python/DB 构建依赖
+# 安装带 pip 的 Python
+nixPkgs = ["python311Full", "poetry", "gcc", "postgresql"]
 
 [phases.build]
 cmds = [
