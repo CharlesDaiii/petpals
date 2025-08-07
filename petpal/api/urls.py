@@ -19,6 +19,7 @@ urlpatterns = [
     path('pets/add/', views.PetFormView.as_view(), name='pet-add'),
     path('pets/success/', lambda request: render(request, 'api/success.html'), name='pet-success'),
     path('api/logout/', views.api_logout, name='logout'),
+    path('api/csrf/', views.get_csrf_token, name='csrf_token'),
     path('auth/redirect/', views.oauth_redirect, name='oauth_redirect'),
     path('ProfileSignUp/', views.profile_signup_redirect, name='profileSignUp'),
     path('api/ProfileSignUp/', views.profile_setup, name='profile_setup'),

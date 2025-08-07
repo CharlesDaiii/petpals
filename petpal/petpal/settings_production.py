@@ -75,6 +75,16 @@ if os.getenv('ADDITIONAL_FRONTEND_URLS'):
 
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS.copy()
 
+# ========== REST Framework Configuration ========== #
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+}
+
 # ========== URL Configuration ========== #
 ROOT_URLCONF = "petpal.urls"
 

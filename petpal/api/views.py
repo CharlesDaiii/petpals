@@ -8,7 +8,8 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.http import require_GET
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.middleware.csrf import get_token
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -48,6 +49,14 @@ def oauth_redirect(request):
 @login_required
 def profile_signup_redirect(request):
     return redirect(f'{settings.FRONTEND_URL}/ProfileSignUp')
+
+@api_view(['GET'])
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    """Get CSRF token for frontend"""
+    return Response({
+        'csrfToken': get_token(request)
+    })
 
 @api_view(['POST'])
 @csrf_exempt

@@ -50,24 +50,30 @@ function HomePage() {
     protectRedirect("", "/ProfileSignUp");
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!isLogin) {
       window.location.href = "/Register";
     } else {
-      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCSRFToken(),
-        },
-        credentials: 'include',
-      })
-        .then((response) => {
-          if (response.ok) {
-            setIsLogin(false);
-            setUsername("");
-          }
+      try {
+        const csrfToken = await getCSRFToken();
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken || '',
+          },
+          credentials: 'include',
         });
+        
+        if (response.ok) {
+          setIsLogin(false);
+          setUsername("");
+        } else {
+          console.error('Logout failed:', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
     }
   };
 
