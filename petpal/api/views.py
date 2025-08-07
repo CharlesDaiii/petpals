@@ -27,6 +27,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Pet
 
+import cloudinary.uploader
+
 # --- authentication methods ---
 # Custom login required decorator, return json response
 def custom_login_required(view_func):
@@ -237,22 +239,29 @@ class MatchingAPIView(APIView):
     def get(self, request):
         return Response({'error': 'Invalid request method'}, status=405)
     
+@csrf_exempt
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def upload_photos(request):
     try:
-        uploaded_files = request.FILES.getlist('photos')  
         photo_urls = []
-
-        for file in uploaded_files:
-            file_path = default_storage.save(f'photos/{file.name}', file)
-
-            photo_url = request.build_absolute_uri(f"{settings.MEDIA_URL}{file_path}")
-            photo_urls.append(photo_url)
-
-        return Response({'photos': photo_urls}, status=200)
+        
+        for photo_file in request.FILES.getlist('photos'):
+            # 上传到Cloudinary
+            upload_result = cloudinary.uploader.upload(
+                photo_file,
+                folder="pet_photos/",
+                transformation=[
+                    {'width': 800, 'height': 800, 'crop': 'limit'},
+                    {'quality': 'auto', 'fetch_format': 'auto'},
+                ]
+            )
+            photo_urls.append(upload_result['secure_url'])
+        
+        return JsonResponse({'photos': photo_urls})
+        
     except Exception as e:
-        return Response({'error': str(e)}, status=400)
+        return JsonResponse({'error': str(e)}, status=400)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

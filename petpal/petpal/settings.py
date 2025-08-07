@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 from configparser import ConfigParser
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 # Production detection - Railway will set this environment variable
 IS_PRODUCTION = os.getenv('DJANGO_ENV') == 'production' or os.getenv('RAILWAY_ENVIRONMENT') is not None
@@ -129,6 +132,16 @@ CSRF_TRUSTED_ORIGINS.extend([
     "http://localhost:3000", 
     "https://localhost:3000",
 ])
+
+# ========== Cloudinary Configuration ========== #
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'), 
+    api_secret=os.getenv('CLOUDINARY_API_SECRET')
+)
+
+if IS_PRODUCTION:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # ========== Session Configuration for Cross-Domain ========== #
 if IS_PRODUCTION:

@@ -32,27 +32,16 @@ const handlePhotoUpload = async (event, photos, setPhotos, getCSRFToken) => {
     const files = event.target.files;
     if (!files.length) return;
 
+    // 创建FormData
     const formData = new FormData();
-    const updatedPhotos = [...photos];
-    
-    // 记录哪些位置放置了新的blob URL
-    const newBlobIndexes = [];
-    
-    Array.from(files).forEach((file, index) => {
+    Array.from(files).forEach(file => {
         formData.append("photos", file);
-        
-        // 找到第一个空位置放置预览图片
-        const firstEmptyIndex = updatedPhotos.indexOf(null);
-        if (firstEmptyIndex !== -1) {
-            updatedPhotos[firstEmptyIndex] = URL.createObjectURL(file);
-            newBlobIndexes.push(firstEmptyIndex); // 记录这个位置
-        }
     });
 
-    // 立即更新状态显示预览图片
-    setPhotos(updatedPhotos);
-
     try {
+        // 显示上传中的状态（可选）
+        console.log(`Uploading ${files.length} photo(s) to Cloudinary...`);
+        
         const csrfToken = await getCSRFToken();
         const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/upload-photos/`, {
             method: "POST",
@@ -60,36 +49,38 @@ const handlePhotoUpload = async (event, photos, setPhotos, getCSRFToken) => {
                 "X-CSRFToken": csrfToken,
             },
             credentials: 'include',
-            body: formData, // upload files
+            body: formData,
         });
 
         if (response.ok) {
             const data = await response.json();
-            console.log("Upload successful, photo URLs:", data.photos);
-            console.log("New blob indexes:", newBlobIndexes);
+            console.log("Upload successful, Cloudinary URLs:", data.photos);
             
-            // 用服务器返回的URL替换刚才创建的blob URL
-            const finalPhotos = [...updatedPhotos]; // 使用updatedPhotos而不是photos
+            // 直接将Cloudinary URLs添加到photos数组中
+            const updatedPhotos = [...photos];
             
-            // 按顺序替换刚才上传的blob URL
-            data.photos.forEach((serverUrl, index) => {
-                if (newBlobIndexes[index] !== undefined) {
-                    const replaceIndex = newBlobIndexes[index];
-                    console.log(`Replacing blob at index ${replaceIndex} with server URL: ${serverUrl}`);
-                    finalPhotos[replaceIndex] = serverUrl;
+            data.photos.forEach(cloudinaryUrl => {
+                const firstEmptyIndex = updatedPhotos.findIndex(photo => photo === null);
+                if (firstEmptyIndex !== -1) {
+                    updatedPhotos[firstEmptyIndex] = cloudinaryUrl;
                 }
             });
             
-            console.log("Final photos after replacement:", finalPhotos);
-            setPhotos(finalPhotos);
+            setPhotos(updatedPhotos);
+            console.log("Photos updated with Cloudinary URLs:", updatedPhotos);
+            
         } else {
-            console.error("Failed to upload photos.");
-            setPhotos(updatedPhotos); // 保持预览状态
+            const errorData = await response.json();
+            console.error("Upload failed:", errorData);
+            alert(`Upload failed: ${errorData.error || 'Unknown error'}`);
         }
     } catch (error) {
         console.error("Photo upload error:", error);
-        setPhotos(updatedPhotos); // 保持预览状态
+        alert('Error uploading photos. Please check your connection and try again.');
     }
+    
+    // 清空文件输入，允许重新选择相同文件
+    event.target.value = '';
 };
 
 export { handleLogout, handlePhotoUpload };
