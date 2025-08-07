@@ -1,5 +1,5 @@
 # nixpacks.toml — 明确启用 Python provider 来确保 pip 可用
-providers = ["python"]
+providers = []
 
 [phases.setup]
 # 使用带 pip 的 Python
