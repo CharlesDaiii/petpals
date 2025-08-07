@@ -264,8 +264,7 @@ except:
     SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET', '')
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
-    "prompt": "select_account",
-    "approval_prompt": "force"
+    "prompt": "select_account"
 }
 SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ["fullname", "picture", "email"]
 
