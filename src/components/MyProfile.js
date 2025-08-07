@@ -86,24 +86,6 @@ const MyProfile = () => {
     fetchFriendsData();
   }, []);
 
-  const handleLogout = async () => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": await getCSRFToken(),
-      },
-      credentials: "include",
-    })
-      .then((response) => {
-        if (response.ok) {
-          setIsLogin(false);
-          setUsername("");
-        }
-      })
-      .catch((err) => console.error("Logout error:", err));
-  };
-
   const handleMouseEnter = () => setShowMenu(true);
   const handleMouseLeave = () => setShowMenu(false);
   const navigate = useNavigate();

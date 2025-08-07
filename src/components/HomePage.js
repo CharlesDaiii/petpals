@@ -51,35 +51,6 @@ function HomePage() {
     protectRedirect("", "/ProfileSignUp");
   };
 
-  const handleLogout = async () => {
-    if (!isLogin) {
-      window.location.href = "/Register";
-    } else {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": await getCSRFToken(),
-          },
-          credentials: "include",
-        });
-        
-        if (response.ok) {
-          setIsLogin(false);
-          setUsername("");
-          if (typeof(Storage) !== "undefined") {
-            sessionStorage.clear();
-            localStorage.clear();
-          }
-        } else {
-          console.error('Logout failed:', response.status, response.statusText);
-        }
-      } catch (error) {
-        console.error('Logout error:', error);
-      }
-    }
-  };
 
   return (
     <div className="HomePage">

@@ -225,36 +225,7 @@ const ProfileSignUp = () => {
         });
     };
 
-    // upload photo event handler function
-    const handlePhotoUpload = async (event) => {
-        const files = event.target.files;
-        const formData = new FormData();
-    
-        Array.from(files).forEach((file) => {
-            formData.append("photos", file);
-        });
-    
-        try {
-            const csrfToken = await getCSRFToken();
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/upload-photos/`, {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": csrfToken,
-                },
-                credentials: 'include',
-                body: formData, // upload files
-            });
-    
-            if (response.ok) {
-                const data = await response.json();
-                setPhotos(data.photos); // update photo URLs
-            } else {
-                console.error("Failed to upload photos.");
-            }
-        } catch (error) {
-            console.error("Photo upload error:", error);
-        }
-    };
+
     
 
     const triggerFileInput = () => {

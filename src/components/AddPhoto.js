@@ -5,20 +5,6 @@ export const AddPhoto = () => {
     const [photos, setPhotos] = useState(Array(6).fill(null));
     const fileInputRef = useRef(null); 
 
-    const handlePhotoUpload = (event) => {
-        const files = Array.from(event.target.files); 
-        const updatedPhotos = [...photos];
-
-        files.forEach((file, index) => {
-            const firstEmptyIndex = updatedPhotos.indexOf(null); 
-            if (firstEmptyIndex !== -1) {
-                updatedPhotos[firstEmptyIndex] = URL.createObjectURL(file); 
-            }
-        });
-
-        setPhotos(updatedPhotos); 
-    };
-
 
     const triggerFileInput = () => {
         fileInputRef.current.click();

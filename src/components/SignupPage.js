@@ -37,23 +37,6 @@ const SignupPage = () => {
     }));
   };
 
-  const handlePhotoUpload = (event) => {
-    const files = Array.from(event.target.files);
-    const updatedPhotos = [...formData.photos];
-
-    files.forEach((file) => {
-      const firstEmptyIndex = updatedPhotos.indexOf(null);
-      if (firstEmptyIndex !== -1) {
-        updatedPhotos[firstEmptyIndex] = URL.createObjectURL(file);
-      }
-    });
-
-    setFormData((prev) => ({
-      ...prev,
-      photos: updatedPhotos,
-    }));
-  };
-
   const handleDeletePhoto = (index) => {
     const updatedPhotos = formData.photos
       .filter((_, i) => i !== index)
