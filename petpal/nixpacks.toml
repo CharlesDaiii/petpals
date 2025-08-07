@@ -10,5 +10,8 @@ cmds = [
   "pip install -r requirements.txt"
 ]
 
+[phases.release]
+cmds = []
+
 [start]
 cmd = "python manage.py collectstatic --noinput && gunicorn petpal.wsgi:application --bind 0.0.0.0:$PORT --workers 3"
