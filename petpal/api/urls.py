@@ -11,7 +11,7 @@ router.register(r'pets', views.PetViewSet)
 
 
 urlpatterns = [
-    path('', views.home, name='home'),
+    path('', views.api_status, name='api_status'),
     path('api/', include(router.urls)),
     path('login/', views.login, name='login'),
     path('logout/', LogoutView.as_view(next_page='/'), name='logout'),

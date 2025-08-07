@@ -55,14 +55,29 @@ def api_logout(request):
         return JsonResponse({"message": "Successfully logged out"}, status=200)
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
+def api_status(request):
+    """Return API status and available endpoints"""
+    return JsonResponse({
+        'status': 'ok',
+        'message': 'PetPals API is running',
+        'version': '1.0.0',
+        'endpoints': {
+            'api': '/api/',
+            'admin': '/admin/', 
+            'oauth': '/oauth/',
+            'pets': '/api/pets/',
+            'auth_redirect': '/auth/redirect/',
+            'profile_setup': '/api/ProfileSignUp/',
+            'matching': '/api/matching/',
+            'user_pet': '/api/user-pet/'
+        }
+    })
+
 def home(request):
     return render(request, 'api/home.html')
 
 def login(request):
     return render(request, 'api/login.html')
-
-def home(request):
-    return render(request, 'api/home.html')
 
 class PetViewSet(ModelViewSet):
     queryset = Pet.objects.all()

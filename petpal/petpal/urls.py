@@ -16,19 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from . import views
 from django.conf.urls.static import static
 from django.conf import settings
-from django.urls import path, re_path
-from django.views.generic import TemplateView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index, name='index'),
     path('oauth/', include('social_django.urls', namespace='social')),
     path('', include('api.urls')),
-    re_path(r'^.*$', views.index),
+    # Catch-all for frontend routes (only in development)
+    # re_path(r'^.*$', views.index),
 ]
 
 if settings.DEBUG:  
