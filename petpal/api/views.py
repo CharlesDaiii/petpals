@@ -43,10 +43,10 @@ def oauth_redirect(request):
                          "username": request.user.username,
                          }, status=200)
 
-# # Custom redirect
-# @login_required
-# def profileSignUp(request):
-#     return redirect(f'{settings.FRONTEND_URL}/ProfileSignUp')
+# Custom redirect
+@login_required
+def profile_signup_redirect(request):
+    return redirect(f'{settings.FRONTEND_URL}/ProfileSignUp')
 
 @login_required
 def api_logout(request):
@@ -54,6 +54,9 @@ def api_logout(request):
         logout(request)
         return JsonResponse({"message": "Successfully logged out"}, status=200)
     return JsonResponse({"error": "Invalid request method"}, status=400)
+
+def home(request):
+    return render(request, 'api/home.html')
 
 def api_status(request):
     """Return API status and available endpoints"""
@@ -72,9 +75,6 @@ def api_status(request):
             'user_pet': '/api/user-pet/'
         }
     })
-
-def home(request):
-    return render(request, 'api/home.html')
 
 def login(request):
     return render(request, 'api/login.html')

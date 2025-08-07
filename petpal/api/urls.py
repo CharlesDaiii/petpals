@@ -11,7 +11,8 @@ router.register(r'pets', views.PetViewSet)
 
 
 urlpatterns = [
-    path('', views.api_status, name='api_status'),
+    path('', views.home, name='home'),
+    path('api/status/', views.api_status, name='api_status'),
     path('api/', include(router.urls)),
     path('login/', views.login, name='login'),
     path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
@@ -19,7 +20,7 @@ urlpatterns = [
     path('pets/success/', lambda request: render(request, 'api/success.html'), name='pet-success'),
     path('api/logout/', views.api_logout, name='logout'),
     path('auth/redirect/', views.oauth_redirect, name='oauth_redirect'),
-    # path('ProfileSignUp/', views.profileSignUp, name='profileSignUp'),
+    path('ProfileSignUp/', views.profile_signup_redirect, name='profileSignUp'),
     path('api/ProfileSignUp/', views.profile_setup, name='profile_setup'),
     # path('api/matching/', views.MatchingAPIView.as_view(), name='matching'),
     # path('Matching/', views.matching_redirect, name='matching_redirect'),

@@ -127,6 +127,21 @@ CSRF_TRUSTED_ORIGINS.extend([
     "https://localhost:3000",
 ])
 
+# ========== Session Configuration for Cross-Domain ========== #
+if IS_PRODUCTION:
+    # 生产环境跨域session配置
+    SESSION_COOKIE_SAMESITE = 'None'
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = 'None'
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+else:
+    # 开发环境
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SECURE = False
+
 # ========== URL Configuration ========== #
 ROOT_URLCONF = "petpal.urls"
 

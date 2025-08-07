@@ -181,8 +181,7 @@ if not DEBUG:
     # Only if using HTTPS
     if BACKEND_URL.startswith('https://'):
         SECURE_SSL_REDIRECT = True
-        SESSION_COOKIE_SECURE = True
-        CSRF_COOKIE_SECURE = True
+        # Session cookie settings are handled in main settings.py
 
 # ========== Logging ========== #
 LOGGING = {
