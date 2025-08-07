@@ -64,12 +64,17 @@ const handlePhotoUpload = async (event, photos, setPhotos, getCSRFToken) => {
             console.log("Upload successful, photo URLs:", data.photos);
             // 用服务器返回的URL替换本地预览URL
             const finalPhotos = [...photos];
+
+            const blobIndexes = [];
+            finalPhotos.forEach((photo, index) => {
+                if (photo && photo.startsWith('blob:')) {
+                    blobIndexes.push(index);
+                }
+            });
+
             data.photos.forEach((serverUrl, index) => {
-                const emptyIndex = finalPhotos.findIndex((photo, i) => 
-                    photo && photo.startsWith('blob:')
-                );
-                if (emptyIndex !== -1) {
-                    finalPhotos[emptyIndex] = serverUrl;
+                if (blobIndexes[index] !== undefined) {
+                    finalPhotos[blobIndexes[index]] = serverUrl;
                 }
             });
             setPhotos(finalPhotos);
