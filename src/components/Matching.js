@@ -95,14 +95,15 @@ export const Matching = () => {
 
     // Add sort by distance function
     const handleSortByDistance = () => {
-        const sortedProfiles = [...profiles].sort((a, b) => a.distance - b.distance);
+        const sortedProfiles = [...profiles].sort((a, b) => Math.abs(a.distance - b.distance));
         setProfiles(sortedProfiles);
         setCurrentIndex(0);
+        console.log("Sorted by distance", sortedProfiles);
     };
 
     const handleSortByMatch = () => {
         const sortedProfiles = [...profiles].sort((a, b) => {
-            return b.matchScore - a.matchScore; 
+            return Math.abs(b.matchScore - a.matchScore); 
         });
         setProfiles(sortedProfiles);
         setCurrentIndex(0);
