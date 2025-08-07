@@ -140,6 +140,7 @@ class PetFormView(View):
 
 @api_view(['POST'])
 # @permission_classes([IsAuthenticated])
+@csrf_exempt
 def profile_setup(request):
     try:
         # 添加调试信息
