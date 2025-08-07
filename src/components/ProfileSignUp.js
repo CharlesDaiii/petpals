@@ -179,6 +179,7 @@ const ProfileSignUp = () => {
             }
 
             try {
+                console.log("backend url", process.env.REACT_APP_BACKEND_URL);
                 const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/check-pet-exists/`, {
                     method: "GET",
                     credentials: "include",
