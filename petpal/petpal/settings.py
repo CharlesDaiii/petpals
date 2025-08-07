@@ -156,14 +156,26 @@ if IS_PRODUCTION:
     # Production database (PostgreSQL on Railway)
     import dj_database_url
     
-    # Always use dj_database_url.config() - Railway will provide DATABASE_URL at runtime
-    DATABASES = {
-        'default': dj_database_url.config(
-            # Don't provide a default - let it fail gracefully during build if no DATABASE_URL
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
+    # Check if DATABASE_URL is available (runtime) vs build phase
+    database_url = os.getenv('DATABASE_URL')
+    
+    if database_url:
+        # Runtime: use real PostgreSQL database
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=database_url,
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        }
+    else:
+        # Build phase: use dummy database config to avoid connection attempts
+        print("[DEBUG] Build phase: using dummy database config")
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.dummy',
+            }
+        }
 else:
     # Development database (SQLite)
     DATABASES = {
