@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../styles/Friends.css";
 import getCSRFToken from "./getCSRFToken";
 import { useNavigate } from "react-router-dom";
+import { handleLogout } from './utils';
 
 const Friends = () => {
   const [followers, setFollowers] = useState([]);
@@ -214,7 +215,7 @@ const Friends = () => {
         </div>
         <button 
           className="header-button" 
-          onClick={isLogin ? handleLogout : handleLoginClick}
+          onClick={isLogin ? () => handleLogout(isLogin, setIsLogin, setUsername, getCSRFToken) : handleLoginClick}
         >
           {isLogin ? "Logout" : "Login"}
         </button>

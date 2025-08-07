@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../styles/HomePage.css';
 import protectRedirect from './protectRedirect';
 import getCSRFToken from './getCSRFToken';
+import { handleLogout } from './utils';
 
 function HomePage() {
   const [isLogin, setIsLogin] = useState(false);
@@ -69,7 +70,7 @@ function HomePage() {
             </div>
           )}
         </div>
-        <button className="header-button" onClick={handleLogout}>
+        <button className="header-button" onClick={() => handleLogout(isLogin, setIsLogin, setUsername, getCSRFToken)}>
           {isLogin ? "Logout" : "Login"}
         </button>
       </header>

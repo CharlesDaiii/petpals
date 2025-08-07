@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import "../styles/OtherProfile.css";
 import { useNavigate } from "react-router-dom";
 import Loading from './Loading';
+import getCSRFToken from './getCSRFToken';
+import { handleLogout } from './utils';
 
 const OtherProfile = () => {
   const { id } = useParams();
@@ -155,7 +157,7 @@ const OtherProfile = () => {
             </div>
           )}
         </div>
-        <button className="header-button" onClick={handleLogout}>
+        <button className="header-button" onClick={() => handleLogout(isLogin, setIsLogin, setUsername, getCSRFToken)}>
           {isLogin ? "Logout" : "Login"}
         </button>
       </header>

@@ -4,6 +4,7 @@ import getCSRFToken from './getCSRFToken';
 import Loading from './Loading';
 import Transition from './Transition'; 
 import { useNavigate } from 'react-router-dom';
+import { handleLogout } from './utils';
 
 export const Matching = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -189,7 +190,7 @@ export const Matching = () => {
                         </div>
                     )}
                 </div>
-                <button className="header-button" onClick={handleLogout}>
+                <button className="header-button" onClick={() => handleLogout(isLogin, setIsLogin, setUsername, getCSRFToken)}>
                     {isLogin ? "Logout" : "Login"}
                 </button>
             </header>

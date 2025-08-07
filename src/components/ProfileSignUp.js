@@ -7,6 +7,7 @@ import protectRedirect from "./protectRedirect";
 import getCSRFToken from "./getCSRFToken";
 import "../styles/RedFlags.css"; 
 import loadGoogleMapsAPI from '../utils/loadGoogleMapsAPI';
+import { handlePhotoUpload } from './utils';
 
 const sexOptions = [
     { value: "male", label: "Male" },
@@ -625,7 +626,7 @@ const ProfileSignUp = () => {
                             ref={fileInputRef}
                             type="file"
                             accept="image/*"
-                            onChange={handlePhotoUpload}
+                            onChange={(event) => handlePhotoUpload(event, photos, setPhotos, getCSRFToken)}
                             className="upload-input"
                         />
                         <div className="button-container">

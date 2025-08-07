@@ -1,4 +1,4 @@
-const handleLogout = async () => {
+const handleLogout = async (isLogin, setIsLogin, setUsername, getCSRFToken) => {
     if (!isLogin) {
         window.location.href = "/Register";
     } else {
@@ -29,7 +29,7 @@ const handleLogout = async () => {
 };
 
 // upload photo event handler function
-const handlePhotoUpload = async (event) => {
+const handlePhotoUpload = async (event, photos, setPhotos, getCSRFToken) => {
     const files = event.target.files;
     if (!files.length) return;
 

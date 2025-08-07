@@ -1,5 +1,7 @@
 import React, { useState, useRef } from "react";
 import "../styles/AddPhoto.css";
+import { handlePhotoUpload } from './utils';
+import getCSRFToken from './getCSRFToken';
 
 export const AddPhoto = () => {
     const [photos, setPhotos] = useState(Array(6).fill(null));
@@ -50,7 +52,7 @@ export const AddPhoto = () => {
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
-                onChange={handlePhotoUpload}
+                onChange={(event) => handlePhotoUpload(event, photos, setPhotos, getCSRFToken)}
                 className="upload-input"
             />
             <button className="button">Next</button>

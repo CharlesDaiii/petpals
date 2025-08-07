@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../styles/MyProfile.css";
 import getCSRFToken from "./getCSRFToken";
 import { useNavigate } from "react-router-dom";
+import { handleLogout } from './utils';
 
 const MyProfile = () => {
   const [petData, setPetData] = useState(null);
@@ -158,7 +159,7 @@ const MyProfile = () => {
             </div>
           )}
         </div>
-        <button className="header-button" onClick={handleLogout}>
+        <button className="header-button" onClick={() => handleLogout(isLogin, setIsLogin, setUsername, getCSRFToken)}>
           {isLogin ? "Logout" : "Login"}
         </button>
       </header>
