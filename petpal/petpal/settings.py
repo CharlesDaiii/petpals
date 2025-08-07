@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 from configparser import ConfigParser
-from django.conf.urls.static import static
 
 # Production detection - Railway will set this environment variable
 IS_PRODUCTION = os.getenv('DJANGO_ENV') == 'production' or os.getenv('RAILWAY_ENVIRONMENT') is not None
