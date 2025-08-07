@@ -1,10 +1,14 @@
 # nixpacks.toml — 延迟数据库迁移到运行时执行
 providers = []
 
+[phases.setup]
+nixPkgs = ["python311", "poetry", "gcc", "postgresql"]  # 或你需要的 Python/DB 构建依赖
+
 [phases.build]
-# 构建阶段只执行安装依赖和打包命令，不要执行 migrate 或 collectstatic
-cmds = ["echo \"Building without touching the database...\""]
+cmds = [
+  "echo 'Building without touching the database...'",
+  "pip install -r requirements.txt"
+]
 
 [start]
-# 启动阶段才进行数据库迁移和静态文件收集，并启动 Gunicorn
 cmd = "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn petpal.wsgi:application --bind 0.0.0.0:$PORT --workers 3"
