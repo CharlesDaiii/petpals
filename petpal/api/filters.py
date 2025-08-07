@@ -228,13 +228,6 @@ def ask(target_pet, pets_data):
 # --- process results ---
 def id_to_display(matching_pets, target_pet, user_id):
     pet_details = []
-    # if isinstance(target_pet, str):
-    #     target_pet = json.loads(target_pet)
-    # if isinstance(target_pet, list) and len(target_pet) > 0:
-    #     pet = target_pet[0]
-    #     if isinstance(pet, dict) and "fields" in pet:
-    #         cleaned_target_pet = pet["fields"]
-    
         
     target_location = target_pet["location"]
 

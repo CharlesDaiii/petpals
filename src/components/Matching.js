@@ -51,7 +51,8 @@ export const Matching = () => {
                 method: 'GET',
                 credentials: 'include',
             });
-            
+            console.log("petResponse", petResponse);
+
             if (petResponse.status === 401) {
                 throw new Error(petResponse.status);
             }
@@ -84,6 +85,7 @@ export const Matching = () => {
             setFetchCount((prevCount) => prevCount + 1);
             setIsLoading(false);
             console.log(`Data fetched. Attempt ${fetchCount + 1}`);
+            console.log("profiles", profiles);
         }
     };
 
