@@ -15,41 +15,56 @@ from pathlib import Path
 from configparser import ConfigParser
 from django.conf.urls.static import static
 
-# Check if we're in production (Railway sets RAILWAY_ENVIRONMENT)
-if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('DJANGO_SETTINGS_MODULE') == 'petpal.settings_production':
-    from .settings_production import *
-else:
-    # Continue with development settings below
-    pass
+# Production detection - Railway will set this environment variable
+IS_PRODUCTION = os.getenv('DJANGO_ENV') == 'production' or os.getenv('RAILWAY_ENVIRONMENT') is not None
 
 # ========== Paths ========== #
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# switch to 'http://localhost:3000' for development
-FRONTEND_URL = "http://localhost:3000"
-# BACKEND_URL = "http://localhost:8000"
-BACKEND_URL = "http://localhost:8000"
+# ========== Environment-specific URLs ========== #
+if IS_PRODUCTION:
+    # Production URLs
+    FRONTEND_URL = os.getenv('FRONTEND_URL', 'https://localhost:3000')
+    BACKEND_URL = os.getenv('BACKEND_URL', 'https://localhost:8000')
+else:
+    # Development URLs  
+    FRONTEND_URL = "http://localhost:3000"
+    BACKEND_URL = "http://localhost:8000"
 
 # ========== Configuration ========== #
 CONFIG = ConfigParser()
 CONFIG.read(BASE_DIR / "config.ini")
 
 # ========== Security ========== #
-# SECRET_KEY = CONFIG.get("Django", "Secret")
-SECRET_KEY = 'django-insecure-localhost-development-key-only'  # Default key for localhost development
-DEBUG = True
-ALLOWED_HOSTS = [
-    '127.0.0.1', 
-    'localhost',
-    '.railway.app',  # Allow all Railway subdomains
-    '.vercel.app',   # Allow Vercel domains for CORS
-]
-
-# Add Railway public domain if available
-if os.getenv('RAILWAY_PUBLIC_DOMAIN'):
-    ALLOWED_HOSTS.append(os.getenv('RAILWAY_PUBLIC_DOMAIN'))
+if IS_PRODUCTION:
+    SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-change-this-in-production')
+    DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+else:
+    # SECRET_KEY = CONFIG.get("Django", "Secret")
+    SECRET_KEY = 'django-insecure-localhost-development-key-only'  # Default key for localhost development
+    DEBUG = True
+if IS_PRODUCTION:
+    ALLOWED_HOSTS = [
+        'localhost',
+        '127.0.0.1',
+        '.railway.app',  # Allow all Railway subdomains
+        '.vercel.app',   # Allow Vercel domains for CORS
+    ]
+    # Add Railway public domain if available
+    if os.getenv('RAILWAY_PUBLIC_DOMAIN'):
+        ALLOWED_HOSTS.append(os.getenv('RAILWAY_PUBLIC_DOMAIN'))
+else:
+    ALLOWED_HOSTS = [
+        '127.0.0.1', 
+        'localhost',
+        '.railway.app',  # Allow all Railway subdomains
+        '.vercel.app',   # Allow Vercel domains for CORS
+    ]
+    # Add Railway public domain if available
+    if os.getenv('RAILWAY_PUBLIC_DOMAIN'):
+        ALLOWED_HOSTS.append(os.getenv('RAILWAY_PUBLIC_DOMAIN'))
 
 # ========== Applications ========== #
 INSTALLED_APPS = [
@@ -69,13 +84,20 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+]
+
+# Add WhiteNoise in production for static file serving
+if IS_PRODUCTION:
+    MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
+
+MIDDLEWARE.extend([
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-]
+])
 
 # ========== CORS Configuration ========== #
 CORS_ALLOW_CREDENTIALS = True
@@ -116,12 +138,24 @@ TEMPLATES = [
 WSGI_APPLICATION = "petpal.wsgi.application"
 
 # ========== Database Configuration ========== #
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if IS_PRODUCTION:
+    # Production database (PostgreSQL on Railway)
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default='postgresql://localhost/petpal',
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    # Development database (SQLite)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # ========== Password Validation ========== #
 AUTH_PASSWORD_VALIDATORS = [
@@ -140,13 +174,20 @@ USE_TZ = True
 # ========== Static and Media Files ========== #
 STATIC_URL = "/static/"
 
-STATICFILES_DIRS = [
-    BASE_DIR.parent / "build/static",
-    BASE_DIR.parent / "build",
-]
-
-# STATIC_ROOT = BASE_DIR / "static"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+if IS_PRODUCTION:
+    # Production static files configuration
+    STATIC_ROOT = BASE_DIR / "staticfiles"
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    
+    # Don't include build directories in production
+    STATICFILES_DIRS = []
+else:
+    # Development static files configuration
+    STATICFILES_DIRS = [
+        BASE_DIR.parent / "build/static",
+        BASE_DIR.parent / "build",
+    ]
+    STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # DEFAULT_PHOTO_URL = 'https://my-bucket.s3.amazonaws.com/default.jpg'
 DEFAULT_PHOTO_URL = f"{STATIC_URL}image/default.png"
