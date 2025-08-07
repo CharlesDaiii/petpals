@@ -65,4 +65,27 @@ except:
 - ✅ 向后兼容性好
 - ✅ 不会再出现ConfigParser错误
 
+## 📦 第三个修复：缺失的应用依赖
+
+### 问题描述
+```
+ModuleNotFoundError: No module named 'googlemaps'
+```
+
+### 解决方案
+在requirements.txt中添加了应用特定的依赖：
+
+```
+# Application specific dependencies
+googlemaps==4.10.0
+openai==1.10.0
+regex==2023.10.3
+Pillow==10.0.1
+```
+
+### 优势
+- ✅ 包含了所有应用代码需要的包
+- ✅ 使用稳定的版本号
+- ✅ 避免了模块导入错误
+
 ## 现在可以正常部署了！ 🚀
