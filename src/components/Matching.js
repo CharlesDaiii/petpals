@@ -37,12 +37,12 @@ export const Matching = () => {
       setShowMenu(false);
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRFToken": getCSRFToken(),
+                "X-CSRFToken": await getCSRFToken(),
             },
             credentials: "include",
         })
@@ -166,7 +166,7 @@ export const Matching = () => {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCSRFToken(),
+                    'X-CSRFToken': await getCSRFToken(),
                 }
             });
 

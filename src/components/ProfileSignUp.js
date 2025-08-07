@@ -234,7 +234,7 @@ const ProfileSignUp = () => {
         });
     
         try {
-            const csrfToken = getCSRFToken();
+            const csrfToken = await getCSRFToken();
             const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/upload-photos/`, {
                 method: "POST",
                 headers: {

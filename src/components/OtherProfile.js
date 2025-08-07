@@ -29,12 +29,12 @@ const OtherProfile = () => {
     setShowMenu(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": getCSRFToken(),
+        "X-CSRFToken": await getCSRFToken(),
       },
       credentials: "include",
     })

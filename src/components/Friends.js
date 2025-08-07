@@ -17,7 +17,7 @@ const Friends = () => {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCSRFToken(),
+                'X-CSRFToken': await getCSRFToken(),
             },
             credentials: 'include',
         });
@@ -70,12 +70,12 @@ const Friends = () => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": getCSRFToken(),
+        "X-CSRFToken": await getCSRFToken(),
       },
       credentials: "include",
     })
@@ -119,7 +119,7 @@ const Friends = () => {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRFToken": getCSRFToken(),
+          "X-CSRFToken": await getCSRFToken(),
         },
       });
   
