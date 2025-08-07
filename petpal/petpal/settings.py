@@ -18,6 +18,15 @@ from django.conf.urls.static import static
 # Production detection - Railway will set this environment variable
 IS_PRODUCTION = os.getenv('DJANGO_ENV') == 'production' or os.getenv('RAILWAY_ENVIRONMENT') is not None
 
+# Debug: Print environment info for troubleshooting
+if IS_PRODUCTION:
+    print(f"[DEBUG] Production environment detected")
+    print(f"[DEBUG] DJANGO_ENV: {os.getenv('DJANGO_ENV')}")
+    print(f"[DEBUG] RAILWAY_ENVIRONMENT: {os.getenv('RAILWAY_ENVIRONMENT')}")
+    print(f"[DEBUG] DATABASE_URL available: {bool(os.getenv('DATABASE_URL'))}")
+else:
+    print(f"[DEBUG] Development environment")
+
 # ========== Paths ========== #
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = '/media/'
@@ -41,6 +50,11 @@ CONFIG.read(BASE_DIR / "config.ini")
 if IS_PRODUCTION:
     SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-change-this-in-production')
     DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+    
+    # Additional production security settings
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = False  # Railway handles SSL termination
+    USE_TZ = True
 else:
     # SECRET_KEY = CONFIG.get("Django", "Secret")
     SECRET_KEY = 'django-insecure-localhost-development-key-only'  # Default key for localhost development
