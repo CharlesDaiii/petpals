@@ -218,4 +218,30 @@ else:
 ### Railway环境变量
 在Railway中设置：`DJANGO_ENV=production`
 
+## 🔧 第八个修复：CORS配置错误
+
+### 问题描述
+Railway部署失败，出现CORS配置错误：
+```
+corsheaders.E014: Origin 'https://petpals-pearl.vercel.app/' in CORS_ALLOWED_ORIGINS should not have path
+```
+
+### 解决方案
+修复CORS配置中的URL格式问题：
+- **问题**：环境变量中的URL包含末尾斜杠（如`https://petpals-pearl.vercel.app/`）
+- **修复**：使用`.rstrip('/')`移除末尾斜杠
+
+**修复代码**：
+```python
+# Production URLs - strip trailing slashes for CORS compatibility
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'https://localhost:3000').rstrip('/')
+BACKEND_URL = os.getenv('BACKEND_URL', 'https://localhost:8000').rstrip('/')
+```
+
+### 优势
+- ✅ 符合CORS规范要求
+- ✅ 确保Railway部署成功
+- ✅ 保持URL配置的一致性
+- ✅ 自动处理环境变量中的格式问题
+
 ## 现在可以正常部署了！ 🚀
