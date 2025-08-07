@@ -1,4 +1,5 @@
 # nixpacks.toml — 延迟数据库迁移到运行时执行
+providers = []
 
 [phases.build]
 # 构建阶段只执行安装依赖和打包命令，不要执行 migrate 或 collectstatic
