@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.http import require_GET
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -403,11 +404,14 @@ def wag_back(request, follower_id):
         return Response({'error': str(e)}, status=400)
     
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@csrf_exempt
 def check_pet_exists(request):
     try:
+        if not request.user.is_authenticated:
+            return Response({"is_authenticated": False, "has_pet": False}, status=200)
+        
         pet_exists = Pet.objects.filter(owner=request.user).exists()
-        return Response({"has_pet": pet_exists}, status=200)
+        return Response({"is_authenticated": True, "has_pet": pet_exists}, status=200)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 

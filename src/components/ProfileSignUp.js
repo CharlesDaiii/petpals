@@ -188,14 +188,23 @@ const ProfileSignUp = () => {
     
                 const data = await response.json();
     
+                // Check if user is authenticated
+                if (data.is_authenticated === false) {
+                    console.log("User not authenticated, redirecting to register");
+                    navigate("/Register");
+                    return;
+                }
+    
+                // If authenticated and has pet, go to matching
                 if (data.has_pet) {
                     navigate("/Matching");
                 } else {
+                    // Authenticated but no pet, show profile setup
                     setShouldRender(true);
                 }
             } catch (error) {
                 console.error("Error checking pet existence:", error);
-                navigate("/login");
+                navigate("/Register");
             } finally {
                 setIsLoading(false);
             }
