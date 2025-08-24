@@ -289,6 +289,26 @@ def get_other_pet(request, id):
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 
+@api_view(['GET'])
+def get_pet_by_id(request, id):
+    try:
+        pet = Pet.objects.get(id=id)
+        if request.user.is_authenticated:
+            if pet.owner == request.user:
+                # View your own pet
+                pet_data = pet.get_data()
+                return Response(pet_data, status=200)
+            else:
+                # View other user's pet; can wag/unwag
+                pet_data = pet.get_data()
+                return Response(pet_data, status=200)
+        else:
+            # View other user's pet; not logged in
+            pet_data = pet.get_data()
+            return Response(pet_data, status=200)
+    except Exception as e:
+        return Response({"Pet id not found": str(e)}, status=404)
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def follow_pet(request, pet_id):

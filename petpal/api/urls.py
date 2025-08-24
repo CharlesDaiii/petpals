@@ -23,8 +23,6 @@ urlpatterns = [
     path('auth/redirect/', views.oauth_redirect, name='oauth_redirect'),
     path('ProfileSignUp/', views.profile_signup_redirect, name='profileSignUp'),
     path('api/ProfileSignUp/', views.profile_setup, name='profile_setup'),
-    # path('api/matching/', views.MatchingAPIView.as_view(), name='matching'),
-    # path('Matching/', views.matching_redirect, name='matching_redirect'),
     path('api/matching/', views.matching, name='matching'),
     path('api/match-pet/', views.match_pet, name='match_pet'),
     path('api/upload-photos/', views.upload_photos, name='upload-photos'),  
@@ -37,6 +35,8 @@ urlpatterns = [
     path('api/wag-back/<int:follower_id>/', views.wag_back, name='wag-back'),
     path('api/update-pet/', views.update_pet, name='update-pet'),
     path('api/user-pet/<int:id>/', views.get_other_pet, name='get-other-pet'),
+
+    path('api/u/<int:id>/', views.get_pet_by_id, name='get-pet-by-id'),
 ]
 
 if settings.DEBUG:  
