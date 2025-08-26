@@ -3,6 +3,7 @@ import "../styles/Friends.css";
 import getCSRFToken from "./getCSRFToken";
 import { useNavigate } from "react-router-dom";
 import { handleLogout } from './utils';
+import Header from './Header';
 
 const Friends = () => {
   const [followers, setFollowers] = useState([]);
@@ -197,29 +198,16 @@ const Friends = () => {
 
   return (
     <div className="friends-container">
-      {/* Header */}
-      <header className="AppHeader">
-        <div
-          className="header-button username"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          {username}
-          {showMenu && (
-            <div className="dropdown-menu">
-              <button onClick={() => navigateTo("Homepage")}>Homepage</button>
-              <button onClick={() => navigateTo("/MyProfile")}>Profile</button>
-              <button onClick={() => navigateTo("/Matching")}>Matching</button>
-            </div>
-          )}
-        </div>
-        <button 
-          className="header-button" 
-          onClick={isLogin ? () => handleLogout(isLogin, setIsLogin, setUsername, getCSRFToken) : handleLoginClick}
-        >
-          {isLogin ? "Logout" : "Login"}
-        </button>
-      </header>
+      <Header 
+        username={username}
+        isLogin={isLogin}
+        handleLogin={handleLoginClick}
+        menuItems={[
+          { label: "Homepage", path: "/" },
+          { label: "Profile", path: "/MyProfile" },
+          { label: "Matching", path: "/Matching" }
+        ]}
+      />
 
       {/* Friends Content */}
       <h1 className="main-title">Friends</h1>

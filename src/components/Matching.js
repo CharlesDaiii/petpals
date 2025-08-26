@@ -5,6 +5,7 @@ import Loading from './Loading';
 import Transition from './Transition'; 
 import { useNavigate } from 'react-router-dom';
 import { handleLogout } from './utils';
+import Header from './Header';
 
 export const Matching = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -45,13 +46,11 @@ export const Matching = () => {
 
         isFetchingRef.current = true;
         try {
-            console.log(`Fetching attempt ${fetchCount + 1}...`);
 
             const petResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/match-pet/`, {
                 method: 'GET',
                 credentials: 'include',
             });
-            console.log("petResponse", petResponse);
 
             if (petResponse.status === 401) {
                 throw new Error(petResponse.status);
@@ -84,8 +83,6 @@ export const Matching = () => {
             isFetchingRef.current = false;
             setFetchCount((prevCount) => prevCount + 1);
             setIsLoading(false);
-            console.log(`Data fetched. Attempt ${fetchCount + 1}`);
-            console.log("profiles", profiles);
         }
     };
 
@@ -176,27 +173,22 @@ export const Matching = () => {
         }
     };
 
+    const handleLoginClick = () => {
+        window.location.href = '/Register';
+    };
+    
     return (
         <div className="matching-container">
-            <header className="AppHeader">
-                <div
-                    className="header-button username"
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                >
-                    {username}
-                    {showMenu && (
-                        <div className="dropdown-menu">
-                            <button onClick={() => navigateTo("Homepage")}>Homepage</button>
-                            <button onClick={() => navigateTo("/MyProfile")}>Profile</button>
-                            <button onClick={() => navigateTo("/Friends")}>Friends</button>
-                        </div>
-                    )}
-                </div>
-                <button className="header-button" onClick={() => handleLogout(isLogin, setIsLogin, setUsername, getCSRFToken)}>
-                    {isLogin ? "Logout" : "Login"}
-                </button>
-            </header>
+            <Header 
+                username={username}
+                isLogin={isLogin}
+                handleLogin={handleLoginClick}
+                menuItems={[
+                    { label: "Homepage", path: "/" },
+                    { label: "Profile", path: "/MyProfile" },
+                    { label: "Friends", path: "/Friends" }
+                ]}
+            />
 
             {isLoading ? (
                 isTransitioning ? (

@@ -79,7 +79,6 @@ const handlePhotoUpload = async (event, photos, setPhotos, getCSRFToken) => {
         alert('Error uploading photos. Please check your connection and try again.');
     }
     
-    // 清空文件输入，允许重新选择相同文件
     event.target.value = '';
 };
 

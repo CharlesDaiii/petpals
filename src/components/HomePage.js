@@ -3,6 +3,7 @@ import '../styles/HomePage.css';
 import protectRedirect from './protectRedirect';
 import getCSRFToken from './getCSRFToken';
 import { handleLogout } from './utils';
+import Header from './Header';
 
 function HomePage() {
   const [isLogin, setIsLogin] = useState(false);
@@ -52,28 +53,22 @@ function HomePage() {
     protectRedirect("", "/ProfileSignUp");
   };
 
+  const handleLoginClick = () => {
+    window.location.href = '/Register';
+  };
 
   return (
     <div className="HomePage">
-      <header className="AppHeader">
-        <div
-          className="header-button username"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          {username}
-          {showMenu && (
-            <div className="dropdown-menu">
-              <button onClick={() => navigateTo('/MyProfile')}>Profile</button>
-              <button onClick={() => navigateTo('/Friends')}>Friends</button>
-              <button onClick={() => navigateTo('/Matching')}>Matching</button>
-            </div>
-          )}
-        </div>
-        <button className="header-button" onClick={() => handleLogout(isLogin, setIsLogin, setUsername, getCSRFToken)}>
-          {isLogin ? "Logout" : "Login"}
-        </button>
-      </header>
+      <Header 
+        username={username}
+        isLogin={isLogin}
+        handleLogin={handleLoginClick}
+        menuItems={[
+          { label: "Profile", path: "/MyProfile" },
+          { label: "Friends", path: "/Friends" },
+          { label: "Matching", path: "/Matching" }
+        ]}
+      />
 
       {/* Other Content */}
       <div className="home-header-section">

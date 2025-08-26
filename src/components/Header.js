@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Header.css';
 
-function Header({ username, isLogin, handleLogin }) {
+function Header({ username, isLogin, handleLogin, menuItems }) {
   const [showMenu, setShowMenu] = useState(false); 
   const navigate = useNavigate();
 
@@ -30,8 +30,11 @@ function Header({ username, isLogin, handleLogin }) {
         {username}
         {showMenu && (
           <div className="dropdown-menu">
-            <button onClick={() => navigateTo('/MyProfile')}>Profile</button>
-            <button onClick={() => navigateTo('/Friends')}>Friends</button>
+            {menuItems.map((item) => (
+              <button key={item.path} onClick={() => navigateTo(item.path)}>
+                {item.label}
+              </button>
+            ))}
           </div>
         )}
       </div>
@@ -46,6 +49,16 @@ Header.propTypes = {
   username: PropTypes.string,
   isLogin: PropTypes.bool.isRequired,
   handleLogin: PropTypes.func.isRequired,
+  menuItems: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      path: PropTypes.string.isRequired,
+    })
+  ),
+};
+
+Header.defaultProps = {
+  menuItems: [],
 };
 
 export default Header;

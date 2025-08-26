@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import "../styles/ProfileSignUp.css";
+import "../styles/Characters.css";
 import "../styles/AddPhoto.css";
 import protectRedirect from "./protectRedirect";
 import getCSRFToken from "./getCSRFToken";
