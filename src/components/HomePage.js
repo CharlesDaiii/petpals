@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/HomePage.css';
 import protectRedirect from './protectRedirect';
-import getCSRFToken from './getCSRFToken';
-import { handleLogout } from './utils';
 import Header from './Header';
 
 function HomePage() {

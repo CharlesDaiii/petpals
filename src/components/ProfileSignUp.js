@@ -1,14 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Select from "react-select";
+import "../styles/ProfileSignUp.css";
+import "../styles/Characters.css";
+import "../styles/AddPhoto.css";
+import "../styles/RedFlags.css"; 
+import loadGoogleMapsAPI from '../utils/loadGoogleMapsAPI';
+import { handlePhotoUpload } from './utils';
+import BasicInfoPage from "./ProfileSignUpPages/BasicInfoPage";
+import PhotosPage from "./ProfileSignUpPages/PhotosPage";
+import CharactersPage from "./ProfileSignUpPages/CharactersPage";
+import RedFlagsPage from "./ProfileSignUpPages/RedFlagsPage";
 import "../styles/ProfileSignUp.css";
 import "../styles/Characters.css";
 import "../styles/AddPhoto.css";
 import protectRedirect from "./protectRedirect";
 import getCSRFToken from "./getCSRFToken";
 import "../styles/RedFlags.css"; 
-import loadGoogleMapsAPI from '../utils/loadGoogleMapsAPI';
-import { handlePhotoUpload } from './utils';
 
 const sexOptions = [
     { value: "male", label: "Male" },
@@ -239,6 +246,9 @@ const ProfileSignUp = () => {
         setPhotos(updatedPhotos);
     };
 
+    // Handler for file input change (for PhotosPage)
+    const onPhotoChange = (event) => handlePhotoUpload(event, photos, setPhotos, getCSRFToken);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
     
@@ -463,263 +473,48 @@ const ProfileSignUp = () => {
                 </button>
             </header>
             <div className="profile-signup">
+                {/* Page1: Basic info */}
                 {currentPage === 1 && (
-                    <div className="form-container">
-                        <div className="profile-title-container">
-                            <div className="profile-title">Profile Sign Up</div>
-                            <div className="profile-paw-print">
-                                <div className="profile-paw-image">
-                                    <img src={`${process.env.PUBLIC_URL}/static/image/g3023.svg`} alt="Paw Print" />
-                                </div>
-                            </div>
-                        </div>
-                        <form className="form-grid">
-                            <label>
-                                Pet Name:
-                                <input
-                                    type="text"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleInputChange}
-                                    maxLength="20"
-                                    className={`input-field ${errors.name ? 'error' : ''}`}
-                                    placeholder="Enter pet's name"
-                                />
-                                {errors.name && <div className="error-text">{errors.name}</div>}
-                            </label>
-                            <label>
-                                Birth Date:
-                                <input
-                                    type="date"
-                                    name="birth_date"
-                                    value={formData.birth_date}
-                                    onChange={handleInputChange}
-                                    className={`input-field ${errors.birth_date ? 'error' : ''}`}
-                                />
-                                {errors.birth_date && <div className="error-text">{errors.birth_date}</div>}
-                            </label>
-                            <label>
-                                Breed:
-                                <input
-                                    type="text"
-                                    name="breed"
-                                    value={formData.breed}
-                                    onChange={handleInputChange}
-                                    className="input-field"
-                                    placeholder="Enter breed"
-                                />
-                            </label>
-                            <label>
-                                Location:
-                                <input
-                                    type="text"
-                                    name="location"
-                                    value={formData.location}
-                                    onChange={handleInputChange}
-                                    className="input-field"
-                                    placeholder="Enter location"
-                                    ref={locationInputRef}
-                                    autoComplete="off"
-                                />
-                                {errors.location && <span className="error-text">{errors.location}</span>}
-                            </label>
-                            <label>
-                                Sex:
-                                <select
-                                    name="sex"
-                                    value={formData.sex}
-                                    onChange={handleInputChange}
-                                    className="input-field"
-                                >
-                                    <option value="">Select</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Neutered">Neutered</option>
-                                </select>
-                            </label>
-                            <label>
-                                Preferred Time:
-                                <select
-                                    name="preferred_time"
-                                    value={formData.preferred_time}
-                                    onChange={handleInputChange}
-                                    className="input-field"
-                                >
-                                    <option value="">Select</option>
-                                    <option value="Morning">Morning</option>
-                                    <option value="Midday">Midday</option>
-                                    <option value="Afternoon">Afternoon</option>
-                                    <option value="Evening">Evening</option>
-                                </select>
-                            </label>
-                            <label>
-                                Weight (LBS):
-                                <input
-                                    type="number"
-                                    name="weight"
-                                    value={formData.weight}
-                                    onChange={handleInputChange}
-                                    max="200"
-                                    className={`input-field ${errors.weight ? 'error' : ''}`}
-                                    placeholder="Enter weight"
-                                />
-                                {errors.weight && <div className="error-text">{errors.weight}</div>}
-                            </label>
-                            <label>
-                                Health State:
-                                <Select
-                                    isMulti
-                                    options={[
-                                        { value: "rabies", label: "Rabies" },
-                                        { value: "dhlpp", label: "DHLPP" },
-                                        { value: "bordetella", label: "Bordetella" },
-                                        { value: "heartworm", label: "Heartworm Prevention" },
-                                        { value: "lyme", label: "Lyme Disease" },
-                                        { value: "leptospirosis", label: "Leptospirosis" },
-                                        { value: "influenza", label: "Canine Influenza" }
-                                    ]}
-                                    onChange={handleSelectChange}
-                                    classNamePrefix="select"
-                                    placeholder="Select health state"
-                                />
-                                
-                            </label>
-                        </form>
-                        <div className="button-container">
-                            <button type="button" className="next-button" onClick={handleNext}>
-                                Next
-                            </button>
-                        </div>
-                    </div>
+                  <BasicInfoPage
+                    formData={formData}
+                    errors={errors}
+                    handleInputChange={handleInputChange}
+                    handleSelectChange={handleSelectChange}
+                    handleNext={handleNext}
+                    locationInputRef={locationInputRef}
+                  />
                 )}
+                {/* Page2: Adding photos */}
                 {currentPage === 2 && (
-                    <div className="adding-photos">
-                        <div className="profile-title-container">
-                            <div className="profile-title">Adding photos for your pet!</div>
-                            <div className="profile-paw-print">
-                                <div className="profile-paw-image">
-                                    <img src={`${process.env.PUBLIC_URL}/static/image/g3023.svg`} alt="Paw Print" />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="photo-grid">
-                            {photos.map((photo, index) => (
-                                <div className="photo-frame" key={index}>
-                                    {photo ? (
-                                        <div className="photo-container">
-                                            <img src={photo} alt={`Pet ${index + 1}`} className="photo" />
-                                            <button
-                                                className="delete-button"
-                                                onClick={() => handleDeletePhoto(index)}
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                    <path d="M18 6L6 18M6 6l12 12" strokeWidth="2" strokeLinecap="round" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <button className="add-photo-button" onClick={triggerFileInput}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M12 4V20M20 12H4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                            </svg>
-                                        </button>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                        <p className="photo-count">{photos.filter((photo) => photo !== null).length}/6</p>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            onChange={(event) => handlePhotoUpload(event, photos, setPhotos, getCSRFToken)}
-                            className="upload-input"
-                        />
-                        <div className="button-container">
-                            <button type="button" className="next-button" onClick={handlePrevious}>
-                                Previous
-                            </button>
-                            <button type="button" className="next-button" onClick={handleNext}>
-                                Next
-                            </button>
-                        </div>
-                    </div>
+                  <PhotosPage
+                    photos={photos}
+                    triggerFileInput={triggerFileInput}
+                    handleDeletePhoto={handleDeletePhoto}
+                    fileInputRef={fileInputRef}
+                    onPhotoChange={onPhotoChange}
+                    handlePrevious={handlePrevious}
+                    handleNext={handleNext}
+                  />
                 )}
            {/* Page3: Characters */}
                 {currentPage === 3 && (
-                    <div className="characters-page">
-                        <div className="profile-title-container">
-                            <div className="profile-title">Select Your Pet's Character</div>
-                            <div className="profile-paw-print">
-                                <div className="profile-paw-image">
-                                    <img src={`${process.env.PUBLIC_URL}/static/image/g3023.svg`} alt="Paw Print" />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="character-grid">
-                            {charactersList.map((character) => (
-                                <button
-                                    key={character.id}
-                                    className={`character-card ${
-                                        selectedCharacters.includes(character) ? "selected" : ""
-                                    } ${
-                                        selectedCharacters.length >= 3 &&
-                                        !selectedCharacters.includes(character) ? "disabled" : ""
-                                    }`}
-                                    onClick={() => handleCharacterSelect(character)}
-                                >
-                                    <span className="character-name">{character.name}</span>
-                                </button>
-                            ))}
-                        </div>
-                        <p className="selection-counter">{selectedCharacters.length}/3</p>
-                        <div className="button-container">
-                            <button type="button" className="next-button" onClick={handlePrevious}>
-                                Previous
-                            </button>
-                            <button type="button" className="next-button" onClick={handleNext}>
-                                Next
-                            </button>
-                        </div>
-                    </div>
+                  <CharactersPage
+                    charactersList={charactersList}
+                    selectedCharacters={selectedCharacters}
+                    handleCharacterSelect={handleCharacterSelect}
+                    handlePrevious={handlePrevious}
+                    handleNext={handleNext}
+                  />
                 )}
             {/* Page4: Red Flags */}
                 {currentPage === 4 && (
-                    <div className="redflags-page">
-                        <div className="profile-title-container">
-                            <div className="profile-title">Red Flags</div>
-                            <div className="profile-paw-print">
-                                <div className="profile-paw-image">
-                                    <img src={`${process.env.PUBLIC_URL}/static/image/g3023.svg`} alt="Paw Print" />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flag-grid">
-                            {redFlagsList.map((flag) => (
-                                <button
-                                    key={flag.id}
-                                    className={`flag-card ${
-                                        selectedFlags.includes(flag) ? "selected" : ""
-                                    } ${
-                                        selectedFlags.length >= 3 &&
-                                        !selectedFlags.includes(flag) ? "disabled" : ""
-                                    }`}
-                                    onClick={() => handleFlagSelect(flag)}
-                                >
-                                    <span className="flag-name">{flag.name}</span>
-                                </button>
-                            ))}
-                        </div>
-                        <p className="selection-counter">{selectedFlags.length}/3</p>
-                        <div className="button-container">
-                            <button type="button" className="next-button" onClick={handlePrevious}>
-                                Previous
-                            </button>
-                            <button type="button" className="next-button" onClick={handleSubmit}>
-                                Submit
-                            </button>
-                        </div>
-                    </div>
+                  <RedFlagsPage
+                    redFlagsList={redFlagsList}
+                    selectedFlags={selectedFlags}
+                    handleFlagSelect={handleFlagSelect}
+                    handlePrevious={handlePrevious}
+                    handleSubmit={handleSubmit}
+                  />
                 )}
             </div>
         </div>
