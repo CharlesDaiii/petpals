@@ -22,7 +22,7 @@ function Header({ username, isLogin, handleLogin, menuItems }) {
 
   return (
     <header className="AppHeader">
-      <div
+      {isLogin && <div
         className="header-button username"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -37,7 +37,7 @@ function Header({ username, isLogin, handleLogin, menuItems }) {
             ))}
           </div>
         )}
-      </div>
+      </div>}
       <button className="header-button" onClick={handleLogin}>
         {isLogin ? "Logout" : "Login"}
       </button>

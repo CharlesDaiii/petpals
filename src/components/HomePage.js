@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../styles/HomePage.css';
 import protectRedirect from './protectRedirect';
 import Header from './Header';
+import getCSRFToken from './getCSRFToken';
 
 function HomePage() {
   const [isLogin, setIsLogin] = useState(false);
@@ -13,18 +14,17 @@ function HomePage() {
       try {
         const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/redirect/`, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           credentials: 'include',
         });
 
         if (response.ok) {
-          console.log("response", response);
-          const data = await response.json(); // Parse the JSON response
+          const data = await response.json();
           if (data && data.is_authenticated) {
             setIsLogin(true);
             setUsername(data.username);
+          } else {
+            setIsLogin(false);
+            setUsername("");
           }
         }
       } catch (error) {
@@ -51,8 +51,22 @@ function HomePage() {
     protectRedirect("", "/ProfileSignUp");
   };
 
-  const handleLoginClick = () => {
-    window.location.href = '/Register';
+  const handleLoginClick = async () => {
+    if (isLogin) {
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "X-CSRFToken": await getCSRFToken(),
+        }
+      })
+      .then(() => {
+        setIsLogin(false);
+        setUsername("");
+      });
+    } else {
+      window.location.href = '/Register';
+    };
   };
 
   return (
@@ -109,6 +123,3 @@ function HomePage() {
 }
 
 export default HomePage;
-
-
-

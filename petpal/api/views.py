@@ -41,11 +41,11 @@ def custom_login_required(view_func):
     return wrapper
 
 @require_GET
-@custom_login_required
 def oauth_redirect(request):
-    return JsonResponse({"is_authenticated": request.user.is_authenticated,
-                         "username": request.user.username,
-                         }, status=200)
+    return JsonResponse({
+            "is_authenticated": request.user.is_authenticated,
+            "username": request.user.username if request.user.is_authenticated else "",
+        }, status=200)
 
 # Custom redirect
 @login_required
@@ -92,53 +92,6 @@ def api_status(request):
 def login(request):
     return render(request, 'api/login.html')
 
-class PetViewSet(ModelViewSet):
-    queryset = Pet.objects.all()
-    serializer_class = PetSerializer
-    permission_classes = [IsAuthenticated]  
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)  
-
-
-class RegisterView(View):
-    def get(self, request):
-        form = RegisterForm()
-        return render(request, 'api/register.html', {'form': form})
-
-    def post(self, request):
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('home')
-        return render(request, 'api/register.html', {'form': form})
-
-class LoginView(View):
-    def get(self, request):
-        form = AuthenticationForm()
-        return render(request, 'api/login.html', {'form': form})
-
-    def post(self, request):
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect('home')
-        return render(request, 'api/login.html', {'form': form})
-
-@method_decorator(login_required, name='dispatch')
-class PetFormView(View):
-    def get(self, request):
-        form = PetForm()
-        return render(request, 'api/pet_form.html', {'form': form})
-    
-    def post(self, request):
-        form = PetForm(request.POST)
-        if form.is_valid():
-            form.save()  
-            return redirect('pet-success')  
-        return render(request, 'api/pet_form.html', {'form': form})
 
 @api_view(['POST'])
 # @permission_classes([IsAuthenticated])
