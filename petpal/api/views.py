@@ -31,17 +31,6 @@ from rest_framework.decorators import action
 
 import cloudinary.uploader
 
-# --- authentication methods ---
-# Custom login required decorator, return json response
-def custom_login_required(view_func):
-    def wrapper(request, *args, **kwargs):
-        next_url = request.GET.get('next', '')
-        next_url = validate_url(next_url)
-        if not request.user.is_authenticated:
-            return JsonResponse({"is_authenticated": False}, status=401)
-        return view_func(request, *args, **kwargs)
-    return wrapper
-
 @require_GET
 def oauth_redirect(request):
     return JsonResponse({

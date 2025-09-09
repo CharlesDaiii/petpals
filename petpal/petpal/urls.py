@@ -24,8 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('oauth/', include('social_django.urls', namespace='social')),
     path('', include('api.urls')),
-    # Catch-all for frontend routes (only in development)
-    # re_path(r'^.*$', views.index),
 ]
 
 if settings.DEBUG:  
