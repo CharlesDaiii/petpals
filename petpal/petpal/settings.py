@@ -97,6 +97,8 @@ INSTALLED_APPS = [
     "api",
     "corsheaders",
     "social_django",
+    "chat",
+    "channels",
 ]
 
 # ========== Middleware ========== #
@@ -190,6 +192,38 @@ TEMPLATES = [
 
 # ========== WSGI Application ========== #
 WSGI_APPLICATION = "petpal.wsgi.application"
+
+# ========== Channels Configuration ========== #
+ASGI_APPLICATION = "petpal.asgi.application"
+REDIS_URL = os.getenv("REDIS_URL")
+USE_INMEMORY = os.getenv("CHANNELS_INMEMORY", "").lower() in {"1", "true", "yes"}
+
+if USE_INMEMORY:
+    CHANNEL_LAYERS = {
+        "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
+    }
+elif REDIS_URL:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                # 直接用连接串（支持 redis:// 与 rediss://）
+                "hosts": [REDIS_URL],
+                # 如果你的提供商要求显式 TLS，可加：
+                # "ssl": True,
+                # 某些提供商还需要： "ssl_cert_reqs": None
+            },
+        }
+    }
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
+        }
+    }
+
+
 
 # ========== Database Configuration ========== #
 if IS_PRODUCTION:

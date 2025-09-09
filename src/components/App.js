@@ -8,6 +8,7 @@ import ProfileSignUp from './ProfileSignUp';
 import MyProfile from './Profile/MyProfile';
 import OtherProfile from './Profile/OtherProfile';
 import Friends from './Friends';
+import Chat from './Chat';
 
 function App() {
     const [petName, setPetName] = useState("");
@@ -26,6 +27,7 @@ function App() {
                     <Route path="/MyProfile" element={<MyProfile />} />
                     <Route path="/OtherProfile/:id" element={<OtherProfile />} />
                     <Route path="/Friends" element={<Friends />} />
+                    <Route path="/Chat/:room_name" element={<Chat />} />
                 </Routes>
             </div>
         </Router>

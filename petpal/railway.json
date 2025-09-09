@@ -5,6 +5,6 @@
   },
   "deploy": {
     "preDeployCommand": ["python manage.py makemigrations && python manage.py migrate --noinput"],
-    "startCommand": "python manage.py collectstatic --noinput && gunicorn petpal.wsgi:application --bind 0.0.0.0:$PORT --workers 3"
+    "startCommand": "python manage.py collectstatic --noinput && python -m daphne -p 8000 petpal.asgi:application"
   }
 }

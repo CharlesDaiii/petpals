@@ -46,7 +46,6 @@ export const Matching = () => {
 
         isFetchingRef.current = true;
         try {
-
             const petResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pets/match-pet/`, {
                 method: 'GET',
                 credentials: 'include',

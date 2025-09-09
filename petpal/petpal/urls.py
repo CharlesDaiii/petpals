@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('oauth/', include('social_django.urls', namespace='social')),
     path('', include('api.urls')),
+    path('chat/', include('chat.urls')),
 ]
 
 if settings.DEBUG:  

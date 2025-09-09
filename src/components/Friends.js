@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import "../styles/Friends.css";
 import getCSRFToken from "./getCSRFToken";
 import { useNavigate } from "react-router-dom";
-import { handleLogout } from './utils';
 import Header from './Header';
 
 const Friends = () => {
