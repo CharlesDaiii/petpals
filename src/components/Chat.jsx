@@ -1,29 +1,27 @@
 import React, { useState, useEffect, useRef } from "react";
-import "../styles/Friends.css"; // we append chat styles here
+import "../styles/Friends.css";
 import getCSRFToken from "./getCSRFToken";
-import Header from './Header';
+import { useOutletContext } from "react-router-dom";
 import { useParams } from "react-router-dom";
 
 function Chat() {
-  const [isLogin, setIsLogin] = useState(false);
-  const [username, setUsername] = useState("");
+  const { rooms,username, isLogin } = useOutletContext();
   const [messages, setMessages] = useState([]);
   const [pendingMessage, setPendingMessage] = useState("");
-  const [loading, setLoading] = useState(true);
-  const { room_name } = useParams();
-
+  const { id } = useParams();
   // 用于滚动到底部
   const bottomRef = useRef(null);
   const messagesWrapRef = useRef(null);
+  
+  const room = rooms.find(r => String(r.id) === id);
 
   const scrollToBottom = () => {
-    // 优先用底部锚点滚动
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   };
 
   const fetchMessages = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/chat/messages/${room_name}/`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/chat/conversations/${id}/messages`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -32,8 +30,6 @@ function Chat() {
         setMessages(data || []);
       }
     } finally {
-      setLoading(false);
-      // 等 DOM 更新后滚动
       setTimeout(scrollToBottom, 0);
     }
   };
@@ -42,7 +38,6 @@ function Chat() {
     const text = pendingMessage.trim();
     if (!text) return;
 
-    // 可选：乐观更新
     const tempId = `temp-${Date.now()}`;
     setMessages(prev => [...prev, {
       id: tempId,
@@ -54,7 +49,7 @@ function Chat() {
     setPendingMessage("");
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/chat/messages/${room_name}/send/`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/chat/conversations/${id}/messages/send/`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -81,82 +76,27 @@ function Chat() {
   };
 
   useEffect(() => {
-    const fetchAuth = async () => {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/redirect/`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data.is_authenticated) {
-            setIsLogin(true);
-            setUsername(data.username);
-          } else {
-            setIsLogin(false);
-            setUsername("");
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchAuth();
-  }, []);
-
-  useEffect(() => {
-    setLoading(true);
     fetchMessages();
-  }, [room_name]);
+  }, [id]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const handleLoginClick = async () => {
-    if (isLogin) {
-      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pets/logout/`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "X-CSRFToken": await getCSRFToken(),
-        }
-      })
-      .then(() => {
-        setIsLogin(false);
-        setUsername("");
-      });
-    } else {
-      window.location.href = '/Register';
-    }
-  };
-
   return (
-    <div className="chat-page">
-      <Header
-        username={username}
-        isLogin={isLogin}
-        handleLogin={handleLoginClick}
-        menuItems={[
-          { label: "Homepage", path: "/" },
-          { label: "Profile", path: "/MyProfile" },
-          { label: "Friends", path: "/Friends" }
-        ]}
-      />
-
+    <div className="chat-window">
       <div className="chat-wrapper">
         <div className="chat-window">
           <div className="chat-header">
-            <div className="chat-room-name">#{room_name}</div>
-            {isLogin ? <div className="chat-me">👤 {username}</div> : <div className="chat-me muted">未登录</div>}
+            <div className="chat-room-name">
+              {room && room.participants && room.participants.length > 1 ? room.participants[1].username : "Loading…"}
+            </div>
+            {isLogin ? <div className="chat-me">👤 {username}</div> : <div className="chat-me muted">Not logged in</div>}
           </div>
 
           <div className="messages-wrap" ref={messagesWrapRef}>
-            {loading ? (
-              <div className="empty muted">Loading messages…</div>
-            ) : messages.length === 0 ? (
-              <div className="empty muted">开始对话吧～</div>
+            {messages.length === 0 ? (
+              <div className="empty muted">Let's Chat～</div>
             ) : (
               <ul className="messages">
                 {messages.map((m) => {
@@ -185,13 +125,13 @@ function Chat() {
             <input
               type="text"
               className="composer-input"
-              placeholder="输入消息…"
+              placeholder="Enter message..."
               value={pendingMessage}
               onChange={(e) => setPendingMessage(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
             />
             <button className="composer-send" onClick={handleSendMessage} disabled={!pendingMessage.trim()}>
-              发送
+              Send
             </button>
           </div>
         </div>

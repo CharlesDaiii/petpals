@@ -285,10 +285,7 @@ if IS_PRODUCTION:
     STATICFILES_DIRS = []
 else:
     # Development static files configuration
-    STATICFILES_DIRS = [
-        BASE_DIR.parent / "build/static",
-        BASE_DIR.parent / "build",
-    ]
+    STATICFILES_DIRS = []
     STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # DEFAULT_PHOTO_URL = 'https://my-bucket.s3.amazonaws.com/default.jpg'

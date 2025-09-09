@@ -8,6 +8,7 @@ import ProfileSignUp from './ProfileSignUp';
 import MyProfile from './Profile/MyProfile';
 import OtherProfile from './Profile/OtherProfile';
 import Friends from './Friends';
+import ChatLayout from './ChatLayout';
 import Chat from './Chat';
 
 function App() {
@@ -27,7 +28,10 @@ function App() {
                     <Route path="/MyProfile" element={<MyProfile />} />
                     <Route path="/OtherProfile/:id" element={<OtherProfile />} />
                     <Route path="/Friends" element={<Friends />} />
-                    <Route path="/Chat/:room_name" element={<Chat />} />
+                    <Route path="/chat" element={<ChatLayout />}>
+                        <Route index element={<div style={{padding:24,color:"#888"}}>Select a chat</div>} />
+                        <Route path=":id" element={<Chat />} />
+                    </Route>
                 </Routes>
             </div>
         </Router>

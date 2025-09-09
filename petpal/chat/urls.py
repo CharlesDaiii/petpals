@@ -4,6 +4,10 @@ from . import views
 
 
 urlpatterns = [
-    path("messages/<str:room_name>/", views.MessageListView.as_view(), name="chat_message_list"),
-    path("messages/<str:room_name>/send/", views.SendMessageView.as_view(), name="chat_send_message"),
+    path("dm/", views.CreateDMView.as_view()),
+    path("group/", views.CreateGroupView.as_view()),
+    path("conversations/", views.UserConversationsView.as_view()),
+    path("conversations/<uuid:id>/read/", views.MarkReadView.as_view()),
+    path("conversations/<uuid:id>/messages/", views.ConversationMessageView.as_view()),
+    path("conversations/<uuid:id>/messages/send/", views.SendMessageView.as_view()),
 ]
