@@ -12,7 +12,7 @@ const usePetData = () => {
           // Conditionally fetch pet data based on the id
           // if id is not provided, fetch the pet data of the current user
           if (id) {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user-pet/${id}/`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pets/user-pet/${id}/`, {
               method: "GET",
               credentials: "include",
             });
@@ -24,7 +24,7 @@ const usePetData = () => {
               setError(errorData.error || "Failed to fetch pet data.");
             }
           } else {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user-pet/`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pets/user-pet/`, {
               method: "GET",
               credentials: "include",
             });

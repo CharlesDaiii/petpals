@@ -47,7 +47,7 @@ export const Matching = () => {
         isFetchingRef.current = true;
         try {
 
-            const petResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/match-pet/`, {
+            const petResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pets/match-pet/`, {
                 method: 'GET',
                 credentials: 'include',
             });
@@ -63,7 +63,7 @@ export const Matching = () => {
             if (!data.pet) throw new Error('No pet data found');
             setUserPet(data.pet);
 
-            const profilesResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/matching/`, {
+            const profilesResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pets/matching/`, {
                 method: 'GET',
                 credentials: 'include',
             });
@@ -143,7 +143,7 @@ export const Matching = () => {
             const isFollowing = profiles.find(p => p.id === profileId)?.isFollowing;
             const endpoint = isFollowing ? 'unfollow-pet' : 'follow-pet';
 
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/${endpoint}/${profileId}/`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pets/${profileId}/${endpoint}/`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

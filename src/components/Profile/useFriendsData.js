@@ -8,8 +8,8 @@ const useFriendsData = () => {
       const fetchFriendsData = async () => {
         try {
           const [followersResponse, followingResponse] = await Promise.all([
-            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/followers/`, { credentials: "include" }),
-            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/following/`, { credentials: "include" })
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pets/followers/`, { credentials: "include" }),
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pets/following/`, { credentials: "include" })
           ]);
   
           if (followersResponse.ok) {

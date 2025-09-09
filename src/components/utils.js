@@ -3,7 +3,7 @@ const handleLogout = async (isLogin, setIsLogin, setUsername, getCSRFToken) => {
         window.location.href = "/Register";
     } else {
         try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pets/logout/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -43,7 +43,7 @@ const handlePhotoUpload = async (event, photos, setPhotos, getCSRFToken) => {
         console.log(`Uploading ${files.length} photo(s) to Cloudinary...`);
         
         const csrfToken = await getCSRFToken();
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/upload-photos/`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pets/upload-photos/`, {
             method: "POST",
             headers: {
                 "X-CSRFToken": csrfToken,

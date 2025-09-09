@@ -190,7 +190,7 @@ const ProfileSignUp = () => {
 
             try {
                 console.log("backend url", process.env.REACT_APP_BACKEND_URL);
-                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/check-pet-exists/`, {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pets/check-pet-exists/`, {
                     method: "GET",
                     credentials: "include",
                 });
@@ -282,8 +282,8 @@ const ProfileSignUp = () => {
 
             const response = await fetch(
                 isEditing
-                    ? `${process.env.REACT_APP_BACKEND_URL}/api/update-pet/`
-                    : `${process.env.REACT_APP_BACKEND_URL}/api/ProfileSignUp/`,
+                    ? `${process.env.REACT_APP_BACKEND_URL}/api/pets/update-pet/`
+                    : `${process.env.REACT_APP_BACKEND_URL}/api/pets/ProfileSignUp/`,
                 {
                     method: "POST",
                     headers: {
@@ -411,7 +411,7 @@ const ProfileSignUp = () => {
         if (from === 'MyProfile') {
             const fetchExistingPetData = async () => {
                 try {
-                    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user-pet/`, {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pets/user-pet/`, {
                         method: "GET",
                         credentials: "include",
                     });

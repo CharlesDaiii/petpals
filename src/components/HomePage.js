@@ -53,7 +53,7 @@ function HomePage() {
 
   const handleLoginClick = async () => {
     if (isLogin) {
-      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/logout/`, {
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/pets/logout/`, {
         method: "POST",
         credentials: "include",
         headers: {

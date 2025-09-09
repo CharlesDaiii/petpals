@@ -35,16 +35,16 @@ const Friends = () => {
 
   const startUpdating = () => {
     const intervalId = setInterval(async () => {
-      await updateData('/api/followers/', (data) => setFollowers(data.followers));
-      await updateData('/api/following/', (data) => setFollowing(data.following));
+      await updateData('/api/pets/followers/', (data) => setFollowers(data.followers));
+      await updateData('/api/pets/following/', (data) => setFollowing(data.following));
     }, 5000);
     return intervalId;
   };
 
   useEffect(() => {
     fetchUserData();
-    updateData('/api/followers/', (data) => setFollowers(data.followers));
-    updateData('/api/following/', (data) => setFollowing(data.following));
+    updateData('/api/pets/followers/', (data) => setFollowers(data.followers));
+    updateData('/api/pets/following/', (data) => setFollowing(data.following));
     const intervalId = startUpdating();
     return () => clearInterval(intervalId);
   }, []);
@@ -93,8 +93,8 @@ const Friends = () => {
   const handleFollowAction = async (action, petId, setState) => {
     const endpoint =
       action === "follow"
-        ? `/api/wag-back/${petId}/`
-        : `/api/unfollow-pet/${petId}/`;
+        ? `/api/pets/${petId}/wag-back/`
+        : `/api/pets/${petId}/unfollow-pet/`;
   
     try {
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}${endpoint}`, {
@@ -128,7 +128,7 @@ const Friends = () => {
 
   const handleFollowing = async (followerId) => {
     await handleFollowAction("follow", followerId, setFollowers);
-    await updateData('/api/following/', (data) => setFollowing(data.following));
+    await updateData('/api/pets/following/', (data) => setFollowing(data.following));
   };
   
   const handleUnfollow = async (followingId) => {
@@ -136,7 +136,7 @@ const Friends = () => {
     if (isConfirmed) {
       await handleFollowAction("unfollow", followingId, setFollowing);
       window.alert("You have unfollowed this user.");
-      await updateData('/api/following/', (data) => setFollowing(data.following));
+      await updateData('/api/pets/following/', (data) => setFollowing(data.following));
     }
   };
   
