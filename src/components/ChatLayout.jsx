@@ -18,17 +18,18 @@ function AddChatModal({ following, onClose, onCreate }) {
     onClose();
   };
 
+  console.log(following);
   return (
     <div className="modal-backdrop">
       <div className="modal">
         <h3>New Chat</h3>
         <div className="list">
           {following.map((f) => (
-            <label key={f.id} className="list-item">
+            <label key={f.owner_id} className="list-item">
               <input
                 type="checkbox"
-                checked={selected.includes(f.id)}
-                onChange={() => toggleSelect(f.id)}
+                checked={selected.includes(f.owner_id)}
+                onChange={() => toggleSelect(f.owner_id)}
               />
               <img src={f.photo} alt={f.name} className="avatar" />
               <span>{f.name}</span>
@@ -162,7 +163,8 @@ export default function ChatLayout() {
         menuItems={[
           { label: "Homepage", path: "/" },
           { label: "Profile", path: "/MyProfile" },
-          { label: "Friends", path: "/Friends" }
+          { label: "Friends", path: "/Friends" },
+          { label: "Chat", path: "/Chat" }
         ]}
       />
     <div className="chat-shell">

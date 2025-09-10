@@ -193,6 +193,8 @@ class PetViewSet(viewsets.ViewSet):
                 try:
                     followed_pet = Pet.objects.get(id=followed_pet.id)
                     following_data.append({
+                        'owner_id': followed_pet.owner.id,
+                        'owner': followed_pet.owner.username,
                         'id': followed_pet.id,
                         'name': followed_pet.name,
                         'photo': followed_pet.photos[0] if followed_pet.photos else None,
@@ -208,7 +210,6 @@ class PetViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["get"], url_path="followers")
     def get_followers(self, request):
         pet_id = request.query_params.get('id', None)
-        print(f"Received get followers request for pet {pet_id}")
         try:
             user_pet = Pet.objects.get(owner=request.user)
 
@@ -223,6 +224,8 @@ class PetViewSet(viewsets.ViewSet):
             for follower_pet in user_pet.followers.all():
                 try:
                     followers_data.append({
+                        'owner_id': follower_pet.owner.id,
+                        'owner': follower_pet.owner.username,
                         'id': follower_pet.id,
                         'name': follower_pet.name,
                         'isFriend': user_pet.is_friend(follower_pet.id),
@@ -240,9 +243,6 @@ class PetViewSet(viewsets.ViewSet):
     @action(detail=True, methods=["post"], url_path="unfollow-pet")
     def unfollow_pet(self, request, pk=None):
         pet_id = pk
-        print(f"Received unfollow request for pet {pet_id}")
-        print(f"User authenticated: {request.user.is_authenticated}")
-        print(f"User: {request.user.username}")
         
         try:        
             user_pet = Pet.objects.get(owner=request.user)

@@ -78,7 +78,8 @@ function HomePage() {
         menuItems={[
           { label: "Profile", path: "/MyProfile" },
           { label: "Friends", path: "/Friends" },
-          { label: "Matching", path: "/Matching" }
+          { label: "Matching", path: "/Matching" },
+          { label: "Chat", path: "/Chat" }
         ]}
       />
 

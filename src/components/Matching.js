@@ -185,7 +185,8 @@ export const Matching = () => {
                 menuItems={[
                     { label: "Homepage", path: "/" },
                     { label: "Profile", path: "/MyProfile" },
-                    { label: "Friends", path: "/Friends" }
+                    { label: "Friends", path: "/Friends" },
+                    { label: "Chat", path: "/Chat" }
                 ]}
             />
 

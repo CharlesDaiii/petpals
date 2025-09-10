@@ -204,7 +204,8 @@ const Friends = () => {
         menuItems={[
           { label: "Homepage", path: "/" },
           { label: "Profile", path: "/MyProfile" },
-          { label: "Matching", path: "/Matching" }
+          { label: "Matching", path: "/Matching" },
+          { label: "Chat", path: "/Chat" }
         ]}
       />
 
