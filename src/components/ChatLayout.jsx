@@ -18,7 +18,6 @@ function AddChatModal({ following, onClose, onCreate }) {
     onClose();
   };
 
-  console.log(following);
   return (
     <div className="modal-backdrop">
       <div className="modal">
@@ -185,17 +184,16 @@ export default function ChatLayout() {
 
         <nav className="room-list">
           {rooms.map(r => {
-            const other = r.participants.find(p => p.username !== username);
             return (
               <NavLink
                 key={r.id}
                 to={`/chat/${r.id}/`}
                 className={({ isActive }) => "room-item" + (isActive ? " active" : "")}
               >
-                <div className="room-avatar">{other.username.slice(0,1).toUpperCase()}</div>
+                <div className="room-avatar">{r.other.username.slice(0,1).toUpperCase()}</div>
                 <div className="room-meta">
                   <div className="room-title">{r.title}</div>
-                  <div className="room-sub">{other.username}</div>
+                  <div className="room-sub">{r.other.username}</div>
                 </div>
               </NavLink>
             );

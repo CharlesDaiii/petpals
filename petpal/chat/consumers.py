@@ -2,22 +2,23 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import Message, ConversationParticipant
+from django.contrib.auth.models import AnonymousUser
 
 @database_sync_to_async
-def save_msg(room, user, text):
-    return Message.objects.create(room=room, sender=user if user.is_authenticated else None, text=text)
+def save_msg(conv_id, user, text):
+    return Message.objects.create(conversation_id=conv_id, sender=user if user.is_authenticated else None, text=text)
 
 @database_sync_to_async
-def is_member(conv_id, user, text):
+def is_member(conv_id, user_id):
     return ConversationParticipant.objects.filter(conversation_id=conv_id, user_id=user_id).exists()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.conv_id = self.scope["url_route"]["kwargs"]["room_name"]  # 路由里用 <conv_id>
+        self.conv_id = self.scope["url_route"]["kwargs"]["conv_id"]
         self.group_name = f"chat_{self.conv_id}"
 
         user = self.scope.get("user", AnonymousUser())
-        if not user.is_authenticated or not await is_member(user.id, self.conv_id):
+        if not user.is_authenticated or not await is_member(self.conv_id, user.id):
             await self.close(code=4003)  # 不允许加入
             return
 
