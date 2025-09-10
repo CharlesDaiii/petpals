@@ -36,6 +36,7 @@ def oauth_redirect(request):
     return JsonResponse({
             "is_authenticated": request.user.is_authenticated,
             "username": request.user.username if request.user.is_authenticated else "",
+            "id": request.user.id if request.user.is_authenticated else "",
         }, status=200)
 
 

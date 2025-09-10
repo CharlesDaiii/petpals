@@ -50,6 +50,7 @@ function AddChatModal({ following, onClose, onCreate }) {
 export default function ChatLayout() {
   const [isLogin, setIsLogin] = useState(false);
   const [username, setUsername] = useState("");
+  const [id, setId] = useState("");
   const [rooms, setRooms] = useState([]);
   const [following, setFollowing] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -103,6 +104,7 @@ export default function ChatLayout() {
       .then(() => {
         setIsLogin(false);
         setUsername("");
+        setId("");
       });
     } else {
       window.location.href = '/Register';
@@ -121,9 +123,11 @@ export default function ChatLayout() {
           if (data && data.is_authenticated) {
             setIsLogin(true);
             setUsername(data.username);
+            setId(data.id);
           } else {
             setIsLogin(false);
             setUsername("");
+            setId("");
           }
         }
       } catch (error) {
@@ -154,6 +158,7 @@ export default function ChatLayout() {
     }
     fetchRooms();
   };
+
   return (
     <div>
       <Header
@@ -179,19 +184,22 @@ export default function ChatLayout() {
         </div>
 
         <nav className="room-list">
-          {rooms.map(r => (
-            <NavLink
-              key={r.id}
-              to={`/chat/${r.id}/`}
-              className={({ isActive }) => "room-item" + (isActive ? " active" : "")}
-            >
-              <div className="room-avatar">{r.participants[1].username.slice(0,1).toUpperCase()}</div>
-              <div className="room-meta">
-                <div className="room-title">{r.title}</div>
-                <div className="room-sub">{r.participants[1].username}</div>
-              </div>
-            </NavLink>
-          ))}
+          {rooms.map(r => {
+            const other = r.participants.find(p => p.username !== username);
+            return (
+              <NavLink
+                key={r.id}
+                to={`/chat/${r.id}/`}
+                className={({ isActive }) => "room-item" + (isActive ? " active" : "")}
+              >
+                <div className="room-avatar">{other.username.slice(0,1).toUpperCase()}</div>
+                <div className="room-meta">
+                  <div className="room-title">{r.title}</div>
+                  <div className="room-sub">{other.username}</div>
+                </div>
+              </NavLink>
+            );
+           })}
         </nav>
       </aside>
 
