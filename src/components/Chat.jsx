@@ -39,19 +39,21 @@ function Chat() {
     const text = pendingMessage.trim();
     if (!text) return;
 
-    const tempId = `temp-${Date.now()}`;
-    setMessages(prev => [...prev, {
-      id: tempId,
+    const msg = {
+      id: `temp-${Date.now()}`,
+      conversation_id: id,
       text,
       sender_name: username || "me",
+      kind: room.kind,
       created_at: new Date().toISOString(),
       __optimistic: true,
-    }]);
+    }
+    setMessages(prev => [...prev, msg]);
     setPendingMessage("");
 
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       try {
-        wsRef.current.send(JSON.stringify({ text }));
+        wsRef.current.send(JSON.stringify({ msg }));
       } catch (e) {
         // fallback to fetch if websocket send fails
         try {
@@ -125,7 +127,9 @@ function Chat() {
     ws.onopen = () => console.log("WS connected");
     ws.onmessage = (event) => {
       try {
+        
         const data = JSON.parse(event.data);
+        console.log("received message:", data);
         if (data && data.id) {
           setMessages(prev => {
             // Avoid duplicating messages

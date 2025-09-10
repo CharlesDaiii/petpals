@@ -22,29 +22,42 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close(code=4003)  # 不允许加入
             return
 
-        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.channel_layer.group_add(
+            self.group_name, 
+            self.channel_name
+        )
         await self.accept()
 
     async def disconnect(self, code):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
+        data = json.loads(text_data).get("msg")
         text = (data.get("text") or "").strip()
+        print("received message:", data)
         if not text:
             return
         await save_msg(self.conv_id, self.scope["user"], text)
         await self.channel_layer.group_send(
             self.group_name,
             {
+                "id": data.get("id"),
                 "type": "chat.message",
                 "text": text,
-                "sender": self.scope["user"].username,
+                "sender_name": data.get("sender_name"),
+                "conversation_id": data.get("conversation_id"),
+                "kind": data.get("kind"),
+                "created_at": data.get("created_at")
             },
         )
 
     async def chat_message(self, event):
+        print("sending message:", event)
         await self.send(text_data=json.dumps({
+            "id": event["id"],
             "text": event["text"],
-            "sender": event["sender"],
+            "sender_name": event["sender_name"],
+            "conversation_id": event["conversation_id"],
+            "kind": event["kind"],
+            "created_at": event["created_at"],
         }))
