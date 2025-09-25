@@ -3,6 +3,7 @@ import '../styles/HomePage.css';
 import protectRedirect from './protectRedirect';
 import Header from './Header';
 import getCSRFToken from './getCSRFToken';
+import SplitText from "../utils/SplitText";
 
 function HomePage() {
   const [isLogin, setIsLogin] = useState(false);
@@ -69,6 +70,7 @@ function HomePage() {
     };
   };
 
+
   return (
     <div className="HomePage">
       <Header 
@@ -88,9 +90,8 @@ function HomePage() {
         <img className="HeaderImage" src={`${process.env.PUBLIC_URL}/static/image/header.jpg`} alt="Header" />
         <div className="home-intro-text">
           <div className="home-tagline">
-            <span className="home-text-black">Connect. </span>
-            <span className="home-text-highlight">Match</span>
-            <span className="home-text-black">.Wag!</span>
+            <SplitText text="Connect." className="home-text-black"/>
+            <SplitText text="Match.Wag!" className="home-text-highlight"/>
           </div>
           <button className="GetStartedButton" onClick={handleGetStarted}>Get Started</button>
         </div>

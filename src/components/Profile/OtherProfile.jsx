@@ -5,7 +5,7 @@ import usePetData from "./usePetData";
 import useFriendsData from "./useFriendsData";
 import ErrorState from "./ErrorState";
 import LoadingState from "./LoadingState";
-import Header from "./Header";
+import Header from "../Header";
 import ProfilePhoto from "./ProfilePhoto";
 import PetInfo from "./PetInfo";
 import ProfileStats from "./ProfileStats";

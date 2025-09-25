@@ -10,7 +10,6 @@ import OtherProfile from './Profile/OtherProfile';
 import Friends from './Friends';
 import ChatLayout from './ChatLayout';
 import Chat from './Chat';
-
 function App() {
     const [petName, setPetName] = useState("");
 
