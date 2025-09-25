@@ -4,6 +4,8 @@ import protectRedirect from './protectRedirect';
 import Header from './Header';
 import getCSRFToken from './getCSRFToken';
 import SplitText from "../utils/SplitText";
+import CardSwap, { Card } from '../utils/CardSwap'
+import StarBorder from '../utils/StarBorder'
 
 function HomePage() {
   const [isLogin, setIsLogin] = useState(false);
@@ -93,32 +95,54 @@ function HomePage() {
             <SplitText text="Connect." className="home-text-black"/>
             <SplitText text="Match.Wag!" className="home-text-highlight"/>
           </div>
-          <button className="GetStartedButton" onClick={handleGetStarted}>Get Started</button>
+          <button class="GetStartedButton" onClick={handleGetStarted}>Get Started</button>
         </div>
+        
       </div>
 
-      <div className="home-promise-section">
-        <div className="home-promise-text">Petpal Promise</div>
-        <div className="home-paw-print">
-          <div className="home-paw-image">
-            <img src={`${process.env.PUBLIC_URL}/static/image/g3023.svg`} alt="Paw Print" />
-          </div>
-        </div>
-      </div>
 
-      <div className="FeaturesSection">
-        <div className="FeatureCard">
-          <img className="FeatureImage" src={`${process.env.PUBLIC_URL}/static/image/1.svg`} alt="Owner Profile" />
-          <div className="FeatureTitle">SET YOUR PROFILE</div>
+      <div style={{ display: 'flex' ,gap: '20px', alignItems: 'flex-start' }}>
+        <div className="petpal-promise">
+          <h2 className="promise-title">Petpal Promise</h2>
+          <p className="promise-subtitle">
+            Connecting pet lovers, matching perfect companions, and making every walk a wagging adventure.
+          </p>
+          <img
+            className="promise-bg"
+            src={`${process.env.PUBLIC_URL}/static/image/g3023.svg`}
+            alt="Paw Print"
+          />
         </div>
-        <div className="FeatureCard">
-          <img className="FeatureImage" src={`${process.env.PUBLIC_URL}/static/image/2.svg`} alt="Pet Shop" />
-          <div className="FeatureTitle">MATCH AND CHAT</div>
-        </div>
-        <div className="FeatureCard">
-          <img className="FeatureImage" src={`${process.env.PUBLIC_URL}/static/image/3.svg`} alt="Pets Allowed" />
-          <div className="FeatureTitle">FIND PLACE TO WALKING</div>
-        </div>
+        <CardSwap
+          width={300}
+          height={300}
+          cardDistance={60}
+          verticalDistance={70}
+          delay={5000}
+          pauseOnHover={false}
+        >
+          <Card>
+            {/* <h3>SET YOUR PROFILE</h3> */}
+            <div className="FeatureCard">
+              <img className="FeatureImage" src={`${process.env.PUBLIC_URL}/static/image/1.svg`} alt="Owner Profile" />
+              <div className="FeatureTitle">SET YOUR PROFILE</div>
+            </div>
+          </Card>
+          <Card>
+            {/* <h3>MATCH AND CHAT</h3> */}
+            <div className="FeatureCard">
+              <img className="FeatureImage" src={`${process.env.PUBLIC_URL}/static/image/2.svg`} alt="Pet Shop" />
+              <div className="FeatureTitle">MATCH AND CHAT</div>
+            </div>
+          </Card>
+          <Card>
+            {/* <h3>FIND PLACE TO WALKING</h3> */}
+            <div className="FeatureCard">
+              <img className="FeatureImage" src={`${process.env.PUBLIC_URL}/static/image/3.svg`} alt="Pets Allowed" />
+              <div className="FeatureTitle">FIND PLACE TO WALKING</div>
+            </div>
+          </Card>
+        </CardSwap>
       </div>
     </div>
   );

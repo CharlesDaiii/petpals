@@ -79,11 +79,20 @@
 
 .home-tagline {
   font-family: 'Open Sans', sans-serif;
-  font-size: clamp(2rem, 4vw, 3.5rem);
-  font-weight: 700;
-  line-height: 1.2;
-}
 
+  /* clamp 参数建议按：最小值, 视口变化值, 最大值 */
+  font-size: clamp(3rem, 8vw, 7rem);
+
+  font-weight: 700;
+
+  /* ✅ 用一个安全的行高范围，0.9 太紧会截 descender */
+  line-height: 1.1;   /* 或者 1.05，仍然紧凑但不切掉 g */
+
+  /* 防止裁切 */
+  overflow: visible;
+  position: relative;
+  margin-bottom: -0.2em;
+}
 .home-text-black {
   color: #3d2828;
 }
@@ -124,6 +133,41 @@
     outline: none;
     box-shadow: 0 0 0 3px rgba(242, 150, 143, 0.4);
   }
+}
+
+.petpal-promise {
+  position: relative;       /* 关键：让内部 absolute 定位参照这个容器 */
+  max-width: 400px;
+  padding: 20px;
+  /* background: #fbe9e7;      你的背景色可调整 */
+  overflow: hidden;         /* 防止背景图溢出 */
+}
+
+.promise-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #4b3f37;
+  margin-bottom: 10px;
+  position: relative;       /* 保证文字在上层 */
+  z-index: 2;
+}
+
+.promise-subtitle {
+  font-size: 1.2rem;
+  color: #6e625a;
+  line-height: 1.6;
+  position: relative;
+  z-index: 2;
+}
+
+.promise-bg {
+  position: absolute;        /* 关键 */
+  bottom: 0;                 /* 定位到底部 */
+  right: 0;                  /* 靠右（可换成 left:0 或居中） */
+  width: 120px;              /* 控制背景大小 */
+  opacity: 0.9;              /* 调整透明度 */
+  z-index: 1;                /* 在文字下 */
+  pointer-events: none;      /* 防止挡住文字交互 */
 }
 
 .home-promise-section {
