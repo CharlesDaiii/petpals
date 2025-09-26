@@ -1,0 +1,11 @@
+{
+    "env": {
+      "es2021": true,     // Enable ES2021 globals like Promise.allSettled
+      "node": true        // If running in Node.js; or use "browser": true for frontend
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn"
+    }
+}
